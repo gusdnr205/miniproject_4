@@ -13,7 +13,7 @@ import Tag from '../components/Tag';
 import CoverImage from '../components/CoverImage';
 import '../styles/detail.css';
 
-const API_URL = 'http://localhost:3000';
+const API_URL = 'http://127.0.0.1:3000';
 
 // "2026-11-20T00:00:00.000Z" → "2026.11.20"
 function formatDate(iso) {
