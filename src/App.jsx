@@ -6,15 +6,17 @@ import PostList from './components/PostList';
 import LikeButton from './components/LikeButton';
 import NameInput from './components/NameInput';
 import PostForm from './components/PostForm';
+import { useFetch } from './api/useFetch';
 
 function App() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { request } = useFetch();
 
   const handleDelete = async (id) => {
     try {
-      await fetch(`http://localhost:3000/posts/${id}`, {
+      await request(`/posts/${id}`, {
         method: 'DELETE'
       })
 
@@ -26,12 +28,10 @@ function App() {
 
   const handleAddPost = async (newPost) => {
     try {
-      const res = await fetch('http://localhost:3000/books', {
+      const saved = await request('/books', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newPost)
+        body: newPost
       });
-      const saved = await res.json();
 
       setPosts([...posts, saved]);
     } catch (err) {
@@ -42,12 +42,10 @@ function App() {
   const handleLike = async (id) => {
     try {
       const post = posts.find((p) => p.id === id);
-      const res = await fetch(`http://localhost:3000/books/${id}`, {
+      const updated = await request(`/books/${id}`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ likes: post.likes + 1 })
-      })
-      const updated = await res.json();
+        body: { likes: post.likes + 1 }
+      });
 
       setPosts(posts.map((p) => p.id === id ? updated : p));
     } catch (err) {
@@ -58,8 +56,7 @@ function App() {
   useEffect(() => {
     async function loadPosts() {
       try {
-        const res = await fetch('http://localhost:3000/books');
-        const data = await res.json();
+        const data = await request('/books');
         setPosts(data);
       } catch (err) {
         console.error(err);
@@ -69,15 +66,7 @@ function App() {
       setLoading(false);
     }
     loadPosts();
-  }, []);
-
-  /*async function loadPosts() {
-    const res = await fetch('http://localhost:3000/posts');
-    const data = await res.json();
-    setPosts(data);
-  }
-
-  loadPosts();*/
+  }, [request]);
 
   if (loading) {
     return (
