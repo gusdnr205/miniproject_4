@@ -1,11 +1,11 @@
 // 내 도서 목록 화면 (담당: 최연진)
 // 맡은 기능: 도서 목록 조회 / 빈 목록 / 조건 조회(검색·장르) / 상세 페이지 이동
 //
-// 받는 값(props)
-//   authorId : 로그인한 사용자 아이디 (db.json books의 AUTHOR_ID) — 이 사람 책만 불러옴
-//   onOpen   : 카드를 눌렀을 때 → onOpen(책ID)  (상세 화면으로 이동)
-//   onCreate : [새 도서 등록]을 눌렀을 때 → onCreate()
+// 주소: /books  (App.jsx 라우터에 연결)
+// - 로그인 화면이 저장한 localStorage의 loginUser.id 로 "내 책"만 불러옴
+// - 카드 클릭 → /books/{책ID} (상세),  [새 도서 등록] → /books/new
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 import './BookListPage.css';
 
 const API_URL = 'http://127.0.0.1:3000';
@@ -30,7 +30,21 @@ function buildBooksUrl(authorId, keyword, genre) {
   return `${API_URL}/books?${params.toString()}`;
 }
 
-export default function BookListPage({ authorId, onOpen = () => {}, onCreate = () => {} }) {
+// 로그인한 사용자 아이디 꺼내기 (로그인 안 했으면 null)
+function getLoginUserId() {
+  try {
+    return JSON.parse(localStorage.getItem('loginUser'))?.id ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export default function BookListPage() {
+  const navigate = useNavigate();
+  const authorId = getLoginUserId();
+  const openDetail = (id) => navigate(`/books/${id}`);
+  const goCreate = () => navigate('/books/new');
+
   const [books, setBooks] = useState([]);
   const [genres, setGenres] = useState([]);
 
@@ -54,6 +68,7 @@ export default function BookListPage({ authorId, onOpen = () => {}, onCreate = (
 
   // 책 목록: 처음 + 검색할 때마다
   useEffect(() => {
+    if (!authorId) return; // 로그인 안 했으면 불러오지 않음
     async function load() {
       setStatus('loading');
       try {
@@ -87,7 +102,15 @@ export default function BookListPage({ authorId, onOpen = () => {}, onCreate = (
 
   // 목록 영역: 상황에 따라 다른 내용
   let content;
-  if (status === 'loading') {
+  if (!authorId) {
+    content = (
+      <div className="list-state">
+        <strong>로그인이 필요해요</strong>
+        <p>로그인하면 내가 등록한 도서를 볼 수 있어요.</p>
+        <button type="button" className="list-btn list-btn-primary" onClick={() => navigate('/login')}>로그인하러 가기</button>
+      </div>
+    );
+  } else if (status === 'loading') {
     content = <div className="list-state">도서 목록을 불러오는 중이에요…</div>;
   } else if (status === 'error') {
     content = (
@@ -107,7 +130,7 @@ export default function BookListPage({ authorId, onOpen = () => {}, onCreate = (
         {isFiltering ? (
           <button type="button" className="list-btn list-btn-primary" onClick={resetSearch}>전체 목록 보기</button>
         ) : (
-          <button type="button" className="list-btn list-btn-primary" onClick={onCreate}>+ 새 도서 등록</button>
+          <button type="button" className="list-btn list-btn-primary" onClick={goCreate}>+ 새 도서 등록</button>
         )}
       </div>
     );
@@ -117,7 +140,7 @@ export default function BookListPage({ authorId, onOpen = () => {}, onCreate = (
         <p className="list-count">{isFiltering ? '검색 결과' : '전체'} {books.length}권 · 최신 등록순</p>
         <div className="list-grid">
           {books.map((book) => (
-            <article key={book.ID} className="list-card" onClick={() => onOpen(book.ID)}>
+            <article key={book.ID} className="list-card" onClick={() => openDetail(book.ID)}>
               <div className="list-card-cover-area">
                 {book.COVER_IMAGE_URL ? (
                   <img className="list-card-cover" src={book.COVER_IMAGE_URL} alt={`${book.TITLE} 표지`} />
@@ -150,7 +173,7 @@ export default function BookListPage({ authorId, onOpen = () => {}, onCreate = (
           <h1 className="list-title">내 도서 목록</h1>
           <p className="list-subtitle">등록한 도서를 찾고 표지를 관리하세요.</p>
         </div>
-        <button type="button" className="list-btn list-btn-primary" onClick={onCreate}>+ 새 도서 등록</button>
+        <button type="button" className="list-btn list-btn-primary" onClick={goCreate}>+ 새 도서 등록</button>
       </div>
 
       {/* 검색 줄: form으로 감싸서 Enter로도 검색 */}

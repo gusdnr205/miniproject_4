@@ -2,12 +2,12 @@
 // - 책 번호(bookId)를 받아 json-server에서 그 책 정보를 불러와 보여줌
 // - 장르는 숫자로 저장돼 있어서, genre 목록을 같이 불러와 이름으로 바꿔서 보여줌
 //
-// 받는 값(props)
-//   bookId   : 보여줄 책의 ID
-//   onBack   : "‹ 도서 목록"을 눌렀을 때 → onBack()
-//   onEdit   : [수정]을 눌렀을 때 → onEdit(book)
-//   onDelete : [삭제]를 눌렀을 때 → onDelete(book)
+// 주소: /books/:id  (App.jsx 라우터에 연결)
+// - 주소의 :id 부분(예: /books/1 → 1)을 useParams()로 읽어서 그 책을 불러옴
+// - ‹ 도서 목록 → /books,  [수정] → /books/{id}/edit
+// - [삭제]는 삭제 담당이 onDelete로 연결 (받는 값: onDelete(book))
 import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router';
 import './BookDetailPage.css';
 
 const API_URL = 'http://127.0.0.1:3000';
@@ -21,7 +21,12 @@ function formatDate(iso) {
   return `${d.getFullYear()}.${mm}.${dd}`;
 }
 
-export default function BookDetailPage({ bookId, onBack = () => {}, onEdit = () => {}, onDelete = () => {} }) {
+export default function BookDetailPage({ onDelete = () => {} }) {
+  const { id: bookId } = useParams();
+  const navigate = useNavigate();
+  const onBack = () => navigate('/books');
+  const onEdit = () => navigate(`/books/${bookId}/edit`);
+
   const [book, setBook] = useState(null);
   const [genres, setGenres] = useState([]);
   // status: 'loading'(불러오는 중) | 'done'(성공) | 'notFound'(없는 책) | 'error'(서버 오류)
@@ -81,7 +86,7 @@ export default function BookDetailPage({ bookId, onBack = () => {}, onEdit = () 
       <div className="detail-topbar">
         <button type="button" className="detail-back" onClick={onBack}>‹ 도서 목록</button>
         <div className="detail-actions">
-          <button type="button" className="detail-btn" onClick={() => onEdit(book)}>수정</button>
+          <button type="button" className="detail-btn" onClick={onEdit}>수정</button>
           <button type="button" className="detail-btn detail-btn-danger" onClick={() => onDelete(book)}>삭제</button>
         </div>
       </div>
