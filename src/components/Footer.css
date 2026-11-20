@@ -24,3 +24,16 @@ main {
   font-size: 13px;
   color: #777;
 }
+
+/* ===== 임시 공통 스타일 (공통 스타일 담당과 합의 후 index.css로 이동) ===== */
+*, *::before, *::after {
+  box-sizing: border-box; /* padding이 폭에 포함되게 해서 카드·목록이 삐져나오지 않게 함 */
+}
+:root {
+  color-scheme: light; /* 다크 모드여도 입력창·선택창이 밝게 보이게 함 */
+}
+body,
+#root {
+  background: #f4f7f5;
+  color: #1f2d27;
+}
