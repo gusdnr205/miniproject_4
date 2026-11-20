@@ -1,105 +1,23 @@
-import { useState, useEffect } from 'react';
-import './App.css'
-import Header from './components/Header';
-import PostItem from './components/PostItem';
-import PostList from './components/PostList';
-import LikeButton from './components/LikeButton';
-import NameInput from './components/NameInput';
-import PostForm from './components/PostForm';
-import { useFetch } from './api/useFetch';
+import { Route, Routes, useNavigate } from 'react-router';
+import PostListPage from './pages/PostListPage';
+import LoginPage from './pages/LoginPage';
 
-function App() {
-  const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const { request } = useFetch();
+export default function App() {
+  const navigate = useNavigate();
+  // 로그인 성공 시 브라우저 기록의 현재 항목을 도서 목록으로 교체한다.
+  const loginPage = <LoginPage onLogin={() => navigate('/books', { replace: true })} />;
 
-  const handleDelete = async (id) => {
-    try {
-      await request(`/posts/${id}`, {
-        method: 'DELETE'
-      })
-
-      setPosts(posts.filter((p) => p.id !== id));
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleAddPost = async (newPost) => {
-    try {
-      const saved = await request('/books', {
-        method: 'POST',
-        body: newPost
-      });
-
-      setPosts([...posts, saved]);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleLike = async (id) => {
-    try {
-      const post = posts.find((p) => p.id === id);
-      const updated = await request(`/books/${id}`, {
-        method: 'PATCH',
-        body: { likes: post.likes + 1 }
-      });
-
-      setPosts(posts.map((p) => p.id === id ? updated : p));
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  useEffect(() => {
-    async function loadPosts() {
-      try {
-        const data = await request('/books');
-        setPosts(data);
-      } catch (err) {
-        console.error(err);
-        setError('게시글을 불러오지 못했어요.');
-      }
-
-      setLoading(false);
-    }
-    loadPosts();
-  }, [request]);
-
-  if (loading) {
-    return (
-      <>
-        <Header />
-        <p>불러오는 중...</p>
-      </>
-    );
-  }
-
-  if (error) {
-    return (
-      <>
-        <Header />
-        <p>에러: {error}</p>
-      </>
-    );
-  }
-
+  // 화면을 구현하면 해당 Route의 element에 페이지 컴포넌트를 연결한다.
   return (
-    <>
-      <Header />
-      {/* <NameInput /> */}
-      <main>
-        <PostForm onAddPost={handleAddPost} />
-        {/* <LikeButton /> */}
-        {/* <button onClick={() => handleLike()}>
-          첫 글 좋아요 (실험) {posts[0].likes}</button> */}
-
-        <PostList posts={posts} onLike={handleLike} onDelete={handleDelete} />
-      </main>
-    </>
-  )
+    <Routes>
+      <Route path="/" element={loginPage} />
+      <Route path="/login" element={loginPage} />
+      <Route path="/books" element={<PostListPage />} />
+      <Route path="/books/new" element={<h1>도서 등록</h1>} />
+      {/* 목록에서 navigate(`/books/${book.ID}`)를 호출하면 상세 화면으로 이동한다. */}
+      <Route path="/books/:id" element={<h1>도서 상세</h1>} />
+      {/* 상세 화면에서 const { id } = useParams()로 ID를 읽고 navigate(`/books/${id}/edit`)로 이동한다. */}
+      <Route path="/books/:id/edit" element={<h1>도서 수정</h1>} />
+    </Routes>
+  );
 }
-
-export default App
