@@ -1,0 +1,49 @@
+.book-card {
+  list-style: none;
+  background: #fff;
+  border: 1px solid #e3e8e5;
+  border-radius: 14px;
+  padding: 12px;
+  cursor: pointer;
+  text-align: left;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.book-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.book-card-cover {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 10px;
+}
+/* 표지가 없을 때 보여주는 대체 표지 */
+.book-card-cover-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: #e3ecec;
+  color: #2f5560;
+  font-weight: 700;
+  text-align: center;
+  word-break: keep-all;
+}
+
+.book-card-title {
+  margin: 12px 0 4px;
+  font-size: 18px;
+  color: #1f2d27;
+}
+.book-card-meta {
+  font-size: 14px;
+  color: #666;
+}
+.book-card-date {
+  margin-top: 8px;
+  font-size: 13px;
+  color: #888;
+}
