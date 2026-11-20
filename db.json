@@ -1,171 +1,42 @@
 {
   "books": [
-    {
-      "ID": 1,
-      "TITLE": "별빛 아래의 서점",
-      "AUTHOR_NM": "한서윤",
-      "AUTHOR_ID": "demo-seoyun",
-      "CONTENT": "오래된 골목의 작은 서점에서 손님들이 남긴 기억이 밤마다 별빛으로 깨어난다.",
-      "COVER_IMAGE_URL": "",
-      "CREATED_AT": "2026-11-20T00:00:00.000Z",
-      "UPDATED_AT": "2026-11-20T00:00:00.000Z",
-      "GENRE": 1
-    },
-    {
-      "ID": 2,
-      "TITLE": "파도가 남긴 편지",
-      "AUTHOR_NM": "한서윤",
-      "AUTHOR_ID": "demo-seoyun",
-      "CONTENT": "바닷가를 걸으며 주운 편지에 담긴 일상을 기록한 에세이.",
-      "COVER_IMAGE_URL": "",
-      "CREATED_AT": "2026-11-19T01:00:00.000Z",
-      "UPDATED_AT": "2026-11-19T01:00:00.000Z",
-      "GENRE": 2
-    },
-    {
-      "ID": 3,
-      "TITLE": "작은 도시 산책",
-      "AUTHOR_NM": "이도현",
-      "AUTHOR_ID": "demo-dohyeon",
-      "CONTENT": "느린 걸음으로 골목과 시장을 둘러보며 발견한 여행 이야기.",
-      "COVER_IMAGE_URL": "",
-      "CREATED_AT": "2026-11-18T02:00:00.000Z",
-      "UPDATED_AT": "2026-11-18T02:00:00.000Z",
-      "GENRE": 19
-    }
+    {"ID": 1, "TITLE": "별빛 아래의 서점", "AUTHOR_NM": "관리자", "AUTHOR_ID": "admin", "CONTENT": "오래된 골목의 작은 서점에서 손님들이 남긴 기억이 밤마다 별빛으로 깨어난다.", "COVER_IMAGE_URL": "", "CREATED_AT": "2026-11-20T00:00:00.000Z", "UPDATED_AT": "2026-11-20T00:00:00.000Z", "GENRE": 1},
+    {"ID": 2, "TITLE": "파도가 남긴 편지", "AUTHOR_NM": "관리자", "AUTHOR_ID": "admin", "CONTENT": "바닷가를 걸으며 주운 편지에 담긴 일상을 기록한 에세이.", "COVER_IMAGE_URL": "", "CREATED_AT": "2026-11-19T01:00:00.000Z", "UPDATED_AT": "2026-11-19T01:00:00.000Z", "GENRE": 2},
+    {"ID": 3, "TITLE": "작은 도시 산책", "AUTHOR_NM": "사용자", "AUTHOR_ID": "user", "CONTENT": "느린 걸음으로 골목과 시장을 둘러보며 발견한 여행 이야기.", "COVER_IMAGE_URL": "", "CREATED_AT": "2026-11-18T02:00:00.000Z", "UPDATED_AT": "2026-11-18T02:00:00.000Z", "GENRE": 19}
   ],
   "user": [
-    {
-      "USER_NM": "관리자",
-      "USER_ID": "admin",
-      "PASSWORD": "admin",
-      "CREATED_AT": "2026-11-17T00:00:00.000Z",
-      "UPDATED_AT": "2026-11-17T00:00:00.000Z"
-    },
-    {
-      "USER_NM": "사용자",
-      "USER_ID": "user",
-      "PASSWORD": "user",
-      "CREATED_AT": "2026-11-17T00:00:00.000Z",
-      "UPDATED_AT": "2026-11-17T00:00:00.000Z"
-    }
+    {"ID": "admin", "USER_NM": "관리자", "PASSWORD": "admin", "CREATED_AT": "2026-11-17T00:00:00.000Z", "UPDATED_AT": "2026-11-17T00:00:00.000Z"},
+    {"ID": "user", "USER_NM": "사용자", "PASSWORD": "user", "CREATED_AT": "2026-11-17T00:00:00.000Z", "UPDATED_AT": "2026-11-17T00:00:00.000Z"}
   ],
   "genre": [
-    {
-      "GENRE_NM": "소설",
-      "GENRE_CODE": 1
-    },
-    {
-      "GENRE_NM": "시/에세이",
-      "GENRE_CODE": 2
-    },
-    {
-      "GENRE_NM": "인문",
-      "GENRE_CODE": 3
-    },
-    {
-      "GENRE_NM": "가정/육아",
-      "GENRE_CODE": 4
-    },
-    {
-      "GENRE_NM": "요리",
-      "GENRE_CODE": 5
-    },
-    {
-      "GENRE_NM": "건강",
-      "GENRE_CODE": 6
-    },
-    {
-      "GENRE_NM": "취미/실용/스포츠",
-      "GENRE_CODE": 7
-    },
-    {
-      "GENRE_NM": "경제/경영",
-      "GENRE_CODE": 8
-    },
-    {
-      "GENRE_NM": "자기계발",
-      "GENRE_CODE": 9
-    },
-    {
-      "GENRE_NM": "정치/사회",
-      "GENRE_CODE": 10
-    },
-    {
-      "GENRE_NM": "역사/문화",
-      "GENRE_CODE": 11
-    },
-    {
-      "GENRE_NM": "종교",
-      "GENRE_CODE": 12
-    },
-    {
-      "GENRE_NM": "예술/대중문화",
-      "GENRE_CODE": 13
-    },
-    {
-      "GENRE_NM": "중/고등참고서",
-      "GENRE_CODE": 14
-    },
-    {
-      "GENRE_NM": "기술/공학",
-      "GENRE_CODE": 15
-    },
-    {
-      "GENRE_NM": "외국어",
-      "GENRE_CODE": 16
-    },
-    {
-      "GENRE_NM": "과학",
-      "GENRE_CODE": 17
-    },
-    {
-      "GENRE_NM": "취업/수험서",
-      "GENRE_CODE": 18
-    },
-    {
-      "GENRE_NM": "여행",
-      "GENRE_CODE": 19
-    },
-    {
-      "GENRE_NM": "컴퓨터/IT",
-      "GENRE_CODE": 20
-    },
-    {
-      "GENRE_NM": "잡지",
-      "GENRE_CODE": 21
-    },
-    {
-      "GENRE_NM": "청소년",
-      "GENRE_CODE": 22
-    },
-    {
-      "GENRE_NM": "초등참고서",
-      "GENRE_CODE": 23
-    },
-    {
-      "GENRE_NM": "유아(0~7세)",
-      "GENRE_CODE": 24
-    },
-    {
-      "GENRE_NM": "어린이(초등)",
-      "GENRE_CODE": 25
-    },
-    {
-      "GENRE_NM": "만화",
-      "GENRE_CODE": 26
-    },
-    {
-      "GENRE_NM": "대학교재",
-      "GENRE_CODE": 27
-    },
-    {
-      "GENRE_NM": "한국소개도서",
-      "GENRE_CODE": 28
-    },
-    {
-      "GENRE_NM": "큰글자책",
-      "GENRE_CODE": 29
-    }
+    {"ID": 1, "GENRE_NM": "소설"},
+    {"ID": 2, "GENRE_NM": "시/에세이"},
+    {"ID": 3, "GENRE_NM": "인문"},
+    {"ID": 4, "GENRE_NM": "가정/육아"},
+    {"ID": 5, "GENRE_NM": "요리"},
+    {"ID": 6, "GENRE_NM": "건강"},
+    {"ID": 7, "GENRE_NM": "취미/실용/스포츠"},
+    {"ID": 8, "GENRE_NM": "경제/경영"},
+    {"ID": 9, "GENRE_NM": "자기계발"},
+    {"ID": 10, "GENRE_NM": "정치/사회"},
+    {"ID": 11, "GENRE_NM": "역사/문화"},
+    {"ID": 12, "GENRE_NM": "종교"},
+    {"ID": 13, "GENRE_NM": "예술/대중문화"},
+    {"ID": 14, "GENRE_NM": "중/고등참고서"},
+    {"ID": 15, "GENRE_NM": "기술/공학"},
+    {"ID": 16, "GENRE_NM": "외국어"},
+    {"ID": 17, "GENRE_NM": "과학"},
+    {"ID": 18, "GENRE_NM": "취업/수험서"},
+    {"ID": 19, "GENRE_NM": "여행"},
+    {"ID": 20, "GENRE_NM": "컴퓨터/IT"},
+    {"ID": 21, "GENRE_NM": "잡지"},
+    {"ID": 22, "GENRE_NM": "청소년"},
+    {"ID": 23, "GENRE_NM": "초등참고서"},
+    {"ID": 24, "GENRE_NM": "유아(0~7세)"},
+    {"ID": 25, "GENRE_NM": "어린이(초등)"},
+    {"ID": 26, "GENRE_NM": "만화"},
+    {"ID": 27, "GENRE_NM": "대학교재"},
+    {"ID": 28, "GENRE_NM": "한국소개도서"},
+    {"ID": 29, "GENRE_NM": "큰글자책"}
   ]
 }
