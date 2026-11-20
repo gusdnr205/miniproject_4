@@ -21,7 +21,7 @@ export default function LoginPage({ onLogin }) {
     setLoading(true);
     try {
       const res = await fetch(
-        `${API_URL}/users?userId=${encodeURIComponent(userId.trim())}&password=${encodeURIComponent(password)}`
+        `${API_URL}/user?ID=${encodeURIComponent(userId.trim())}&PASSWORD=${encodeURIComponent(password)}`
       );
       if (!res.ok) throw new Error("서버 오류");
       const users = await res.json();
@@ -32,7 +32,7 @@ export default function LoginPage({ onLogin }) {
       }
 
       // 비밀번호는 빼고 저장
-      const loginUser = { id: users[0].id, userId: users[0].userId, userNm: users[0].userNm };
+      const loginUser = { id: users[0].ID, userNm: users[0].USER_NM };
       localStorage.setItem("loginUser", JSON.stringify(loginUser));
       onLogin(loginUser);
     } catch {
