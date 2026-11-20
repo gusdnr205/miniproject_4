@@ -1,0 +1,205 @@
+.book-form {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  text-align: left;
+  container-type: inline-size; /* 폼 자신의 폭을 기준으로 배치를 바꿈 */
+}
+
+.book-create-page {
+  padding: 32px 24px 48px;
+}
+
+.book-create-title {
+  max-width: 1100px;
+  margin: 0 auto 16px;
+  font-size: 32px;
+  text-align: left;
+}
+
+.book-form-card {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 32px;
+  padding: 24px;
+  background: var(--color-card, #fff);
+  border: 1px solid var(--color-border, #dfe5e0);
+  border-radius: var(--radius, 12px);
+}
+
+.book-form-fields,
+.book-form-cover {
+  min-width: 0; /* 긴 내용이 있어도 칸이 화면 밖으로 밀리지 않게 */
+}
+
+.book-form-section {
+  margin-bottom: 16px;
+  font-size: 20px;
+}
+
+.book-form-label {
+  display: block;
+  margin: 14px 0 6px;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.book-form-required {
+  color: var(--color-danger, #a33a2a);
+}
+
+.book-form-input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--color-border, #dfe5e0);
+  border-radius: var(--radius-sm, 8px);
+  background: #fafbfa;
+  font: inherit;
+}
+.book-form-input:focus {
+  outline: 2px solid var(--color-primary-light, #e3efe8);
+  border-color: var(--color-primary, #1d6b50);
+}
+.book-form-input[aria-invalid='true'] {
+  border-color: var(--color-danger, #a33a2a);
+}
+
+.book-form-textarea {
+  resize: vertical;
+}
+
+.book-form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+.book-form-row > div {
+  min-width: 0;
+}
+
+.book-form-error {
+  margin-top: 4px;
+  font-size: 13px;
+  color: var(--color-danger, #a33a2a);
+}
+
+.book-form-cover {
+  padding-left: 32px;
+  border-left: 1px solid var(--color-border, #dfe5e0);
+}
+
+.book-form-cover-box {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: var(--radius, 12px);
+  object-fit: contain;
+  background: #e4e8ef;
+}
+
+.book-form-cover-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 16px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--color-sub, #5f6661);
+}
+.book-form-cover-empty strong {
+  color: var(--color-text, #1f2a24);
+}
+
+.book-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.book-form-button {
+  min-height: var(--touch, 44px);
+  padding: 0 20px;
+  border: 1px solid var(--color-border, #dfe5e0);
+  border-radius: var(--radius-sm, 8px);
+  background: var(--color-card, #fff);
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.book-form-cancel {
+  margin-left: auto; /* 삭제 버튼은 왼쪽, 취소·저장은 오른쪽 */
+}
+
+.book-form-delete {
+  border-color: var(--color-danger, #a33a2a);
+  color: var(--color-danger, #a33a2a);
+}
+
+.book-form-submit {
+  border-color: var(--color-primary, #1d6b50);
+  background: var(--color-primary, #1d6b50);
+  color: #fff;
+}
+.book-form-submit:hover {
+  background: var(--color-primary-dark, #15523d);
+}
+.book-form-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 수정 화면: 저장된 표지와 AI 버튼 */
+.book-cover-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.book-cover-image {
+  display: block;
+  width: 100%;
+  max-height: 360px;
+  object-fit: contain;
+  border-radius: var(--radius, 12px);
+  background-color: #e4e8ef;
+}
+
+.book-cover-note {
+  font-size: 13px;
+  color: var(--color-primary, #1d6b50);
+}
+
+/* 폼 폭이 720px보다 좁으면: 표지를 아래로 내리고 한 줄로 쌓기 */
+@container (max-width: 720px) {
+  .book-form-card {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 20px;
+  }
+  .book-form-cover {
+    padding-left: 0;
+    border-left: none;
+  }
+  .book-form-cover-box {
+    aspect-ratio: 16 / 7;
+  }
+}
+
+/* 아주 좁은 화면(휴대폰): 버튼을 꽉 차게 */
+@container (max-width: 420px) {
+  .book-form-actions .book-form-button {
+    flex: 1;
+  }
+}
+
+/* 휴대폰: 페이지 바깥 여백 줄이기 */
+@media (max-width: 768px) {
+  .book-create-page {
+    padding: 24px 16px 40px;
+  }
+}
