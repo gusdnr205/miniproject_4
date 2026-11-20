@@ -1,0 +1,41 @@
+/* atoms 부품 기본 스타일 — 색·간격은 은주님 CSS 작업 때 조정 */
+:root {
+  --green: #1f6b52;
+  --green-dark: #17543f;
+  --green-light: #e4f0ea;
+  --red: #b3412c;
+  --gray-bg: #f4f6f4;
+  --border: #dfe3e0;
+  --text: #1c2420;
+  --text-sub: #6b7570;
+  --radius: 8px;
+}
+
+.btn { padding: 8px 16px; border-radius: var(--radius); border: 1px solid var(--border);
+  background: #fff; color: var(--text); font-size: 14px; cursor: pointer; }
+.btn:hover:not(:disabled) { background: var(--gray-bg); }
+.btn:disabled { opacity: 0.45; cursor: default; }
+.btn-primary { background: var(--green); border-color: var(--green); color: #fff; }
+.btn-primary:hover:not(:disabled) { background: var(--green-dark); }
+.btn-danger { border-color: var(--red); color: var(--red); }
+
+.input { width: 100%; box-sizing: border-box; padding: 9px 12px; border: 1px solid var(--border);
+  border-radius: var(--radius); background: #fafbfa; font-size: 14px; color: var(--text); }
+.input:focus { outline: none; border-color: var(--green); background: #fff; }
+.input-error { border-color: var(--red); }
+.textarea { resize: vertical; line-height: 1.6; }
+
+.checkbox { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; cursor: pointer; }
+.checkbox input { width: 16px; height: 16px; accent-color: var(--green); }
+
+.tag { display: inline-block; padding: 3px 10px; border-radius: 999px; background: var(--green-light);
+  color: var(--green-dark); font-size: 12px; }
+
+.cover { position: relative; overflow: hidden; border-radius: 6px; background: #e3e7ee; aspect-ratio: 2 / 3; }
+.cover-sm { width: 120px; } .cover-md { width: 200px; } .cover-lg { width: 260px; }
+.cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.cover-empty { display: flex; align-items: center; justify-content: center; border: 1px dashed #c4cbc7; }
+.cover-empty-text { color: var(--text-sub); font-size: 13px; }
+.cover-overlay { position: absolute; left: 0; right: 0; bottom: 0; padding: 12px;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.6)); color: #fff; display: flex; flex-direction: column; }
+.cover-overlay strong { font-size: 15px; } .cover-overlay span { font-size: 12px; opacity: 0.85; }
