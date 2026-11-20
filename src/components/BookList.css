@@ -1,0 +1,105 @@
+.book-list-page {
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px 48px;
+  text-align: left;
+}
+
+.book-list-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+.book-list-head h2 {
+  font-size: 36px;
+  color: #1f2d27;
+}
+.book-list-head p {
+  margin-top: 6px;
+  color: #777;
+}
+
+.book-list-create {
+  border: none;
+  padding: 12px 20px;
+  border-radius: 10px;
+  background: #2f6650;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.book-list-create:hover {
+  background: #265341;
+}
+
+.book-list-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 14px;
+  margin-bottom: 20px;
+  background: #fff;
+  border: 1px solid #e3e8e5;
+  border-radius: 14px;
+}
+.book-list-filter input {
+  flex: 1;
+  min-width: 200px;
+  padding: 10px 12px;
+  border: 1px solid #d5ddd9;
+  border-radius: 8px;
+  font: inherit;
+}
+.book-list-filter select {
+  padding: 10px 12px;
+  border: 1px solid #d5ddd9;
+  border-radius: 8px;
+  background: #fff;
+  font: inherit;
+}
+.book-list-filter button {
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  background: #2f6650;
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.book-list-count {
+  margin-bottom: 12px;
+  color: #666;
+  font-size: 14px;
+}
+
+/* 화면 폭에 따라 열 개수가 자동으로 바뀜 */
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+  padding: 0;
+}
+
+.book-list-empty {
+  padding: 60px 0;
+  text-align: center;
+  color: #888;
+}
+.book-list-empty .book-list-create {
+  margin-top: 16px;
+}
+
+@media (max-width: 640px) {
+  .book-list-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .book-list-head h2 {
+    font-size: 28px;
+  }
+}
