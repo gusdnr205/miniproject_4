@@ -1,120 +1,114 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
+import { useState, useEffect } from 'react';
 import './App.css'
+import Header from './components/Header';
+import PostItem from './components/PostItem';
+import PostList from './components/PostList';
+import LikeButton from './components/LikeButton';
+import NameInput from './components/NameInput';
+import PostForm from './components/PostForm';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  const handleDelete = async (id) => {
+    try {
+      await fetch(`http://localhost:3000/posts/${id}`, {
+        method: 'DELETE'
+      })
+
+      setPosts(posts.filter((p) => p.id !== id));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleAddPost = async (newPost) => {
+    try {
+      const res = await fetch('http://localhost:3000/posts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newPost)
+      });
+      const saved = await res.json();
+
+      setPosts([...posts, saved]);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleLike = async (id) => {
+    try {
+      const post = posts.find((p) => p.id === id);
+      const res = await fetch(`http://localhost:3000/posts/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ likes: post.likes + 1 })
+      })
+      const updated = await res.json();
+
+      setPosts(posts.map((p) => p.id === id ? updated : p));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    async function loadPosts() {
+      try {
+        const res = await fetch('http://localhost:3000/posts');
+        const data = await res.json();
+        setPosts(data);
+      } catch (err) {
+        console.error(err);
+        setError('게시글을 불러오지 못했어요.');
+      }
+
+      setLoading(false);
+    }
+    loadPosts();
+  }, []);
+
+  /*async function loadPosts() {
+    const res = await fetch('http://localhost:3000/posts');
+    const data = await res.json();
+    setPosts(data);
+  }
+
+  loadPosts();*/
+
+  if (loading) {
+    return (
+      <>
+        <Header />
+        <p>불러오는 중...</p>
+      </>
+    );
+  }
+
+  if (error) {
+    return (
+      <>
+        <Header />
+        <p>에러: {error}</p>
+      </>
+    );
+  }
 
   return (
     <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+      <Header />
+      {/* <NameInput /> */}
+      <main>
+        <PostForm onAddPost={handleAddPost} />
+        {/* <LikeButton /> */}
+        {/* <button onClick={() => handleLike()}>
+          첫 글 좋아요 (실험) {posts[0].likes}</button> */}
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
+        <PostList posts={posts} onLike={handleLike} onDelete={handleDelete} />
+      </main>
     </>
   )
 }
