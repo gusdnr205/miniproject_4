@@ -1,17 +1,14 @@
 // 도서 상세 화면 (담당: 최연진)
-// - 책 번호(bookId)를 받아서 json-server에서 그 책 정보를 불러와 보여줌
+// - 책 번호(bookId)를 받아 json-server에서 그 책 정보를 불러와 보여줌
 // - 장르는 숫자로 저장돼 있어서, genre 목록을 같이 불러와 이름으로 바꿔서 보여줌
 //
 // 받는 값(props)
-//   bookId   : 보여줄 책의 ID (예: 1)
-//   onBack   : "‹ 도서 목록"을 눌렀을 때 실행할 함수
-//   onEdit   : [수정]을 눌렀을 때 실행할 함수 → onEdit(book)
-//   onDelete : [삭제]를 눌렀을 때 실행할 함수 → onDelete(book)
+//   bookId   : 보여줄 책의 ID
+//   onBack   : "‹ 도서 목록"을 눌렀을 때 → onBack()
+//   onEdit   : [수정]을 눌렀을 때 → onEdit(book)
+//   onDelete : [삭제]를 눌렀을 때 → onDelete(book)
 import { useEffect, useState } from 'react';
-import Button from '../components/Button';
-import Tag from '../components/Tag';
-import CoverImage from '../components/CoverImage';
-import '../styles/detail.css';
+import './BookDetailPage.css';
 
 const API_URL = 'http://127.0.0.1:3000';
 
@@ -24,7 +21,7 @@ function formatDate(iso) {
   return `${d.getFullYear()}.${mm}.${dd}`;
 }
 
-function BookDetailPage({ bookId, onBack = () => {}, onEdit = () => {}, onDelete = () => {} }) {
+export default function BookDetailPage({ bookId, onBack = () => {}, onEdit = () => {}, onDelete = () => {} }) {
   const [book, setBook] = useState(null);
   const [genres, setGenres] = useState([]);
   // status: 'loading'(불러오는 중) | 'done'(성공) | 'notFound'(없는 책) | 'error'(서버 오류)
@@ -55,7 +52,6 @@ function BookDetailPage({ bookId, onBack = () => {}, onEdit = () => {}, onDelete
     load();
   }, [bookId, retry]);
 
-  // ── 불러오는 중 / 없는 책 / 오류 화면 ──
   if (status === 'loading') {
     return <div className="detail-state">도서 정보를 불러오는 중이에요…</div>;
   }
@@ -64,7 +60,7 @@ function BookDetailPage({ bookId, onBack = () => {}, onEdit = () => {}, onDelete
       <div className="detail-state">
         <strong>도서를 찾을 수 없어요</strong>
         <p>삭제되었거나 없는 도서예요.</p>
-        <Button onClick={onBack}>도서 목록으로</Button>
+        <button type="button" className="detail-btn" onClick={onBack}>도서 목록으로</button>
       </div>
     );
   }
@@ -73,33 +69,34 @@ function BookDetailPage({ bookId, onBack = () => {}, onEdit = () => {}, onDelete
       <div className="detail-state">
         <strong>도서 정보를 불러오지 못했어요</strong>
         <p>json-server가 켜져 있는지 확인하고 다시 시도해주세요.</p>
-        <Button onClick={() => setRetry((n) => n + 1)}>다시 시도</Button>
+        <button type="button" className="detail-btn" onClick={() => setRetry((n) => n + 1)}>다시 시도</button>
       </div>
     );
   }
 
-  // ── 정상 화면 ──
-  const genreName = genres.find((g) => g.GENRE_CODE === Number(book.GENRE))?.GENRE_NM;
+  const genreName = genres.find((g) => g.ID === Number(book.GENRE))?.GENRE_NM;
 
   return (
     <div className="detail-page">
       <div className="detail-topbar">
-        <button type="button" className="detail-back" onClick={onBack}>
-          ‹ 도서 목록
-        </button>
+        <button type="button" className="detail-back" onClick={onBack}>‹ 도서 목록</button>
         <div className="detail-actions">
-          <Button onClick={() => onEdit(book)}>수정</Button>
-          <Button variant="danger" onClick={() => onDelete(book)}>삭제</Button>
+          <button type="button" className="detail-btn" onClick={() => onEdit(book)}>수정</button>
+          <button type="button" className="detail-btn detail-btn-danger" onClick={() => onDelete(book)}>삭제</button>
         </div>
       </div>
 
       <section className="detail-card">
-        <div className="detail-cover">
-          <CoverImage url={book.COVER_IMAGE_URL} title={book.TITLE} author={book.AUTHOR_NM} size="lg" />
+        <div className="detail-cover-area">
+          {book.COVER_IMAGE_URL ? (
+            <img className="detail-cover" src={book.COVER_IMAGE_URL} alt={`${book.TITLE} 표지`} />
+          ) : (
+            <div className="detail-cover detail-cover-empty">표지 없음</div>
+          )}
         </div>
 
         <div className="detail-info">
-          {genreName && <Tag>{genreName}</Tag>}
+          {genreName && <span className="detail-tag">{genreName}</span>}
           <h1 className="detail-title">{book.TITLE}</h1>
           <p className="detail-author">{book.AUTHOR_NM}</p>
           <p className="detail-dates">
@@ -117,5 +114,3 @@ function BookDetailPage({ bookId, onBack = () => {}, onEdit = () => {}, onDelete
     </div>
   );
 }
-
-export default BookDetailPage;

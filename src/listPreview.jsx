@@ -9,13 +9,13 @@ import BookDetailPage from './pages/BookDetailPage';
 
 // 로그인 기능이 아직 없어서, 미리보기에서는 사용자를 골라서 확인
 const USERS = [
-  { id: 'demo-seoyun', label: '한서윤 (책 2권)' },
-  { id: 'demo-dohyeon', label: '이도현 (책 1권)' },
+  { id: 'admin', label: '관리자 (책 2권)' },
+  { id: 'user', label: '사용자 (책 1권)' },
   { id: 'nobody', label: '책 없는 사용자' },
 ];
 
 function ListPreview() {
-  const [authorId, setAuthorId] = useState('demo-seoyun');
+  const [authorId, setAuthorId] = useState('admin');
   const [openedId, setOpenedId] = useState(null); // null이면 목록, 숫자면 그 책 상세
 
   return (
