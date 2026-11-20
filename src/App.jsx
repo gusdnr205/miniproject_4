@@ -26,7 +26,7 @@ function App() {
 
   const handleAddPost = async (newPost) => {
     try {
-      const res = await fetch('http://localhost:3000/posts', {
+      const res = await fetch('http://localhost:3000/books', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newPost)
@@ -42,7 +42,7 @@ function App() {
   const handleLike = async (id) => {
     try {
       const post = posts.find((p) => p.id === id);
-      const res = await fetch(`http://localhost:3000/posts/${id}`, {
+      const res = await fetch(`http://localhost:3000/books/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ likes: post.likes + 1 })
@@ -58,7 +58,7 @@ function App() {
   useEffect(() => {
     async function loadPosts() {
       try {
-        const res = await fetch('http://localhost:3000/posts');
+        const res = await fetch('http://localhost:3000/books');
         const data = await res.json();
         setPosts(data);
       } catch (err) {
