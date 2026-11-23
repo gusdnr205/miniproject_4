@@ -91,6 +91,7 @@
   margin-top: 12px;
   font-size: 14px;
   color: var(--color-danger);
+  word-break: keep-all;   /* 한글 단어 중간에서 줄바꿈 안 함 */
 }
 
 .login-button {
