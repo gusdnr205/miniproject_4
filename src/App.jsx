@@ -1,6 +1,7 @@
 import { Route, Routes, useNavigate } from 'react-router';
 import PostListPage from './pages/PostListPage';
 import LoginPage from './pages/LoginPage';
+import BookListPage from './pages/BookListPage';
 
 export default function App() {
   const navigate = useNavigate();
@@ -12,7 +13,9 @@ export default function App() {
     <Routes>
       <Route path="/" element={loginPage} />
       <Route path="/login" element={loginPage} />
-      <Route path="/books" element={<PostListPage />} />
+      {/* <Route path="/books" element={<PostListPage />} /> */}
+      <Route path="/books" element={<BookListPage />} /> 
+  
       <Route path="/books/new" element={<h1>도서 등록</h1>} />
       {/* 목록에서 navigate(`/books/${book.ID}`)를 호출하면 상세 화면으로 이동한다. */}
       <Route path="/books/:id" element={<h1>도서 상세</h1>} />
