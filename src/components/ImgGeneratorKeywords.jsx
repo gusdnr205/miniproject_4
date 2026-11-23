@@ -21,7 +21,9 @@ function ImgGeneratorKeywords({ onKeywordsChange }) {
     onKeywordsChange?.(nextKeywords)
   }
 
-  const handleSubmit = (event) => {
+  const handleKeyDown = (event) => {
+    if (event.key !== 'Enter') return
+
     event.preventDefault()
     addKeyword()
   }
@@ -44,15 +46,16 @@ function ImgGeneratorKeywords({ onKeywordsChange }) {
         ))}
       </div>
 
-      <form className='img-gen-keywords-add' onSubmit={handleSubmit}>
+      <div className='img-gen-keywords-add'>
         <p>직접 입력</p>
         <input
           value={keyword}
           onChange={(event) => setKeyword(event.target.value)}
+          onKeyDown={handleKeyDown}
           aria-label='키워드 직접 입력'
         />
-        <button type='submit'>추가</button>
-      </form>
+        <button type='button' onClick={addKeyword}>추가</button>
+      </div>
     </>
   )
 }
