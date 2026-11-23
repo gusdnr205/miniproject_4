@@ -160,7 +160,9 @@ function BookForm({
 
         <section className="book-form-cover">
           <h2 className="book-form-section">표지 이미지</h2>
-          {cover ?? (
+          {typeof cover === 'function'
+            ? cover({ TITLE: title, AUTHOR_NM: authorNm, GENRE: Number(genre), CONTENT: content })
+            : cover ?? (
             <div className="book-form-cover-box book-form-cover-empty">
               <strong>등록된 표지가 없어요</strong>
               <span>등록 후 AI 표지를 만들 수 있어요.</span>

@@ -197,6 +197,21 @@
   margin: 0;
 }
 
+/* 표지 칸을 왼쪽 높이만큼 늘리고, AI 버튼은 맨 아래로 */
+.book-form-cover {
+  display: flex;
+  flex-direction: column;
+}
+.book-cover-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.book-cover-panel .img-gen-trigger {
+  margin-top: auto;
+}
+
 /* 폼 폭이 720px보다 좁으면: 표지를 아래로 내리고 한 줄로 쌓기 */
 @container (max-width: 720px) {
   .book-form-card {
@@ -226,3 +241,4 @@
     padding: 24px 16px 40px;
   }
 }
+
