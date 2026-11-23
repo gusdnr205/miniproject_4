@@ -186,7 +186,12 @@ function BookForm({
         <button type="button" className="book-form-button book-form-cancel" onClick={handleCancel}>
           취소
         </button>
-        <button type="submit" className="book-form-button book-form-submit" disabled={submitting}>
+        <button
+          type="submit"
+          className="book-form-button book-form-submit"
+          disabled={submitting || (isEdit && !isDirty)}
+          title={isEdit && !isDirty ? '바뀐 내용이 없어요' : undefined}
+        >
           {submitting ? '저장 중…' : isEdit ? '저장' : '등록'}
         </button>
       </div>
