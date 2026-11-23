@@ -59,11 +59,11 @@ export default function BookEditPage() {
   };
 
   if (loadingBook || (!book && !bookError)) {
-    return <main className="book-create-page"><p>도서 정보를 불러오는 중이에요…</p></main>;
+    return <main className="book-form-page"><p>도서 정보를 불러오는 중이에요…</p></main>;
   }
   if (bookError) {
     return (
-      <main className="book-create-page">
+      <main className="book-form-page">
         <p className="book-form-error" role="alert">도서 정보를 불러오지 못했어요.</p>
         <button type="button" className="book-form-button" onClick={() => navigate('/books')}>
           목록으로
@@ -96,9 +96,9 @@ export default function BookEditPage() {
   );
 
   return (
-    <main className="book-create-page">
-      <h1 className="book-create-title">도서 수정</h1>
-      {saveError && <p className="book-form-error" role="alert">저장하지 못했어요. 잠시 후 다시 시도해 주세요.</p>}
+    <main className="book-form-page">
+      <h1 className="book-form-title">도서 수정</h1>
+      {saveError && <p className="book-form-error" role="alert">처리하지 못했어요. 잠시 후 다시 시도해 주세요.</p>}
       <BookForm
         genres={genres}
         initialBook={book}

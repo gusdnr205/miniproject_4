@@ -13,7 +13,7 @@ function getLoginUser() {
 }
 
 // 도서 등록 페이지 (/books/new)
-export default function BookCreatePage() {
+export default function BookNewPage() {
   const navigate = useNavigate();
   const loginUser = getLoginUser();
   const [genres, setGenres] = useState([]);
@@ -49,8 +49,8 @@ export default function BookCreatePage() {
   };
 
   return (
-    <main className="book-create-page">
-      <h1 className="book-create-title">도서 등록</h1>
+    <main className="book-form-page">
+      <h1 className="book-form-title">도서 등록</h1>
       {genreError && <p className="book-form-error" role="alert">장르 목록을 불러오지 못했어요.</p>}
       {saveError && <p className="book-form-error" role="alert">도서를 등록하지 못했어요. 잠시 후 다시 시도해 주세요.</p>}
       <BookForm
