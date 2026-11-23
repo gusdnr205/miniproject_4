@@ -1,0 +1,75 @@
+.list-selection {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.list-selection label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.list-card:has(> .list-card-select) {
+  position: relative;
+}
+
+.list-card-select {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  border: 1px solid #dfe3e0;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.list-selection input,
+.list-card-select input {
+  margin: 0;
+  accent-color: #1f6b52;
+}
+
+.list-btn.list-btn-danger,
+.detail-btn.detail-btn-danger {
+  border-color: #b3412c;
+  color: #b3412c;
+}
+
+.list-btn-danger:disabled,
+.detail-btn-danger:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.list-delete-error,
+.detail-delete-error {
+  margin-bottom: 16px;
+  color: #963829;
+  font-size: 14px;
+}
+
+.delete-book-dialog {
+  width: min(440px, calc(100% - 32px));
+  padding: 24px;
+  border: 1px solid #dfe3e0;
+  border-radius: 16px;
+  background: #fff;
+  color: #1c2420;
+  text-align: left;
+}
+
+.delete-book-dialog::backdrop { background: rgb(17 30 24 / 55%); }
+.delete-book-dialog h2 { color: inherit; font-size: 20px; font-weight: 700; }
+.delete-book-dialog p { color: #53645b; font-size: 15px; }
+.delete-book-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+.delete-book-actions button { padding: 9px 14px; border: 1px solid #dfe3e0; border-radius: 8px; background: #fff; color: #1c2420; cursor: pointer; }
+.delete-book-actions .delete-book-confirm { border-color: #963829; background: #963829; color: #fff; }

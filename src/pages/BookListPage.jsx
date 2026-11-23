@@ -2,11 +2,13 @@
 // 맡은 기능: 도서 목록 조회 / 빈 목록 / 조건 조회(검색·장르) / 상세 페이지 이동
 //
 // 주소: /books  (App.jsx 라우터에 연결)
-// - 로그인 화면이 저장한 localStorage의 loginUser.id 로 "내 책"만 불러옴
+// - 관리자는 전체 도서, 일반 사용자는 로그인 ID로 "내 책"을 불러옴
 // - 카드 클릭 → /books/{책ID} (상세),  [새 도서 등록] → /books/new
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { useFetch } from '../api/useFetch';
+import DeleteBookDialog from '../components/DeleteBookDialog';
+import { canDeleteBook, getLoginUserId, isAdmin } from '../utils/bookPermissions';
 import './BookListPage.css';
 
 // 서버 주소는 각 파일에 적지 않고 .env의 VITE_API_URL 한 곳에서 관리 (useFetch가 붙여줌)
@@ -43,20 +45,13 @@ function getStartDate(days) {
 //   장르 필터    : ...&GENRE={장르ID}  ("장르 전체"면 생략)
 //   표지 생성일  : ...&CREATED_AT_gte={시작 날짜}  (그 날짜 이후에 만든 책만, "전체"면 생략)
 function buildBooksUrl(authorId, keyword, genre, days) {
-  const params = new URLSearchParams({ AUTHOR_ID: authorId, _sort: 'CREATED_AT', _order: 'desc' });
+  const params = new URLSearchParams({ _sort: 'CREATED_AT', _order: 'desc' });
+  // 관리자만 작성자 필터를 생략해 다른 사용자의 도서도 관리할 수 있다.
+  if (!isAdmin(authorId)) params.append('AUTHOR_ID', authorId);
   if (keyword) params.append('q', keyword);
   if (genre) params.append('GENRE', genre);
   if (days !== '') params.append('CREATED_AT_gte', getStartDate(days));
   return `/books?${params.toString()}`;
-}
-
-// 로그인한 사용자 아이디 꺼내기 (로그인 안 했으면 null)
-function getLoginUserId() {
-  try {
-    return JSON.parse(localStorage.getItem('loginUser'))?.id ?? null;
-  } catch {
-    return null;
-  }
 }
 
 export default function BookListPage() {
@@ -68,6 +63,10 @@ export default function BookListPage() {
 
   const [books, setBooks] = useState([]);
   const [genres, setGenres] = useState([]);
+  const [selectedIds, setSelectedIds] = useState(() => new Set());
+  const [deleting, setDeleting] = useState(false);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
 
   // 입력 중인 값 (검색 버튼을 누르기 전)
   const [keywordInput, setKeywordInput] = useState('');
@@ -90,22 +89,30 @@ export default function BookListPage() {
   // 책 목록: 처음 + 검색할 때마다
   useEffect(() => {
     if (!authorId) return; // 로그인 안 했으면 불러오지 않음
+    let ignore = false;
     async function load() {
       setStatus('loading');
       try {
-        setBooks(await request(buildBooksUrl(authorId, filter.keyword, filter.genre, filter.days)));
+        const data = await request(buildBooksUrl(authorId, filter.keyword, filter.genre, filter.days));
+        if (ignore) return;
+        setBooks(data);
         setStatus('done');
       } catch (err) {
+        if (ignore) return;
         console.error(err);
         setStatus('error');
       }
     }
     load();
+    return () => { ignore = true; };
   }, [authorId, filter, retry, request]);
 
   // 검색 (버튼 또는 Enter)
   const handleSearch = (e) => {
     e.preventDefault();
+    // 화면에 보이지 않는 도서가 선택 삭제에 남지 않도록 검색할 때 선택을 초기화한다.
+    setSelectedIds(new Set());
+    setDeleteError('');
     setFilter({ keyword: keywordInput.trim(), genre: genreInput, days: dateInput });
   };
 
@@ -114,11 +121,49 @@ export default function BookListPage() {
     setKeywordInput('');
     setGenreInput('');
     setDateInput('');
+    setSelectedIds(new Set());
+    setDeleteError('');
     setFilter({ keyword: '', genre: '', days: '' });
   };
 
   const genreNameOf = (code) => genres.find((g) => g.ID === Number(code))?.GENRE_NM ?? '';
   const isFiltering = Boolean(filter.keyword || filter.genre || filter.days);
+  const deletableBooks = books.filter((book) => canDeleteBook(authorId, book));
+  const selectedBooks = deletableBooks.filter((book) => selectedIds.has(book.ID));
+  const allSelected = deletableBooks.length > 0 && selectedBooks.length === deletableBooks.length;
+
+  function toggleSelection(id, checked) {
+    setSelectedIds((current) => {
+      const next = new Set(current);
+      if (checked) next.add(id);
+      else next.delete(id);
+      return next;
+    });
+  }
+
+  async function handleDeleteSelected() {
+    setConfirmingDelete(false);
+    const currentUserId = getLoginUserId();
+    const targets = selectedBooks.filter((book) => canDeleteBook(currentUserId, book));
+    if (deleting || targets.length === 0) return;
+
+    setDeleting(true);
+    setDeleteError('');
+    try {
+      // JSON Server에는 일괄 삭제 API가 없으므로 도서별로 요청한다.
+      // 일부만 실패하면 성공한 항목만 제거하고 실패한 항목은 선택 상태로 남긴다.
+      const results = await Promise.allSettled(targets.map((book) => (
+        request(`/books/${encodeURIComponent(book.ID)}`, { method: 'DELETE' })
+      )));
+      const removedIds = new Set(targets.filter((_, index) => results[index].status === 'fulfilled').map((book) => book.ID));
+      const failedCount = targets.length - removedIds.size;
+      setBooks((current) => current.filter((book) => !removedIds.has(book.ID)));
+      setSelectedIds((current) => new Set([...current].filter((id) => !removedIds.has(id))));
+      if (failedCount) setDeleteError(`${failedCount}권을 삭제하지 못했어요. 선택된 도서를 다시 시도해 주세요.`);
+    } finally {
+      setDeleting(false);
+    }
+  }
 
   // 목록 영역: 상황에 따라 다른 내용
   let content;
@@ -158,9 +203,41 @@ export default function BookListPage() {
     content = (
       <>
         <p className="list-count">{isFiltering ? '검색 결과' : '전체'} {books.length}권 · 최신 등록순</p>
+        {deletableBooks.length > 0 && (
+          <div className="list-selection">
+            <label>
+              <input
+                type="checkbox"
+                checked={allSelected}
+                disabled={deleting}
+                onChange={(event) => setSelectedIds(new Set(event.target.checked ? deletableBooks.map((book) => book.ID) : []))}
+              />
+              전체 선택
+            </label>
+            <button
+              type="button"
+              className="list-btn list-btn-danger"
+              disabled={deleting || selectedBooks.length === 0}
+              onClick={() => setConfirmingDelete(true)}
+            >
+              {deleting ? '삭제 중…' : `선택 삭제 (${selectedBooks.length})`}
+            </button>
+          </div>
+        )}
         <div className="list-grid">
           {books.map((book) => (
             <article key={book.ID} className="list-card" onClick={() => openDetail(book.ID)}>
+              {canDeleteBook(authorId, book) && (
+                <label className="list-card-select" onClick={(event) => event.stopPropagation()}>
+                  <input
+                    type="checkbox"
+                    aria-label={`${book.TITLE} 선택`}
+                    checked={selectedIds.has(book.ID)}
+                    disabled={deleting}
+                    onChange={(event) => toggleSelection(book.ID, event.target.checked)}
+                  />
+                </label>
+              )}
               <div className="list-card-cover-area">
                 {book.COVER_IMAGE_URL ? (
                   <img className="list-card-cover" src={book.COVER_IMAGE_URL} alt={`${book.TITLE} 표지`} />
@@ -190,7 +267,7 @@ export default function BookListPage() {
     <div className="list-page">
       <div className="list-heading">
         <div>
-          <h1 className="list-title">내 도서 목록</h1>
+          <h1 className="list-title">{isAdmin(authorId) ? '전체 도서 목록' : '내 도서 목록'}</h1>
           <p className="list-subtitle">등록한 도서를 찾고 표지를 관리하세요.</p>
         </div>
         <button type="button" className="list-btn list-btn-primary" onClick={goCreate}>+ 새 도서 등록</button>
@@ -200,24 +277,29 @@ export default function BookListPage() {
       <form className="list-search" onSubmit={handleSearch}>
         <input
           className="list-input list-search-keyword"
+          disabled={deleting}
           value={keywordInput}
           onChange={(e) => setKeywordInput(e.target.value)}
           placeholder="제목 또는 저자 검색"
         />
-        <select className="list-input list-search-genre" value={genreInput} onChange={(e) => setGenreInput(e.target.value)}>
+        <select className="list-input list-search-genre" value={genreInput} disabled={deleting} onChange={(e) => setGenreInput(e.target.value)}>
           <option value="">장르 전체</option>
           {genres.map((g) => (
             <option key={g.ID} value={g.ID}>{g.GENRE_NM}</option>
           ))}
         </select>
-        <select className="list-input list-search-date" value={dateInput} onChange={(e) => setDateInput(e.target.value)}>
+        <select className="list-input list-search-date" value={dateInput} disabled={deleting} onChange={(e) => setDateInput(e.target.value)}>
           {DATE_OPTIONS.map((o) => (
             <option key={o.value} value={o.value}>{o.label}</option>
           ))}
         </select>
-        <button type="submit" className="list-btn list-btn-primary">검색</button>
+        <button type="submit" className="list-btn list-btn-primary" disabled={deleting}>검색</button>
       </form>
 
+      {deleteError && <p className="list-delete-error" role="alert">{deleteError}</p>}
+      {confirmingDelete && (
+        <DeleteBookDialog count={selectedBooks.length} onCancel={() => setConfirmingDelete(false)} onConfirm={handleDeleteSelected} />
+      )}
       {content}
     </div>
   );

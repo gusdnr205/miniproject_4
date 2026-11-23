@@ -5,10 +5,12 @@
 // 주소: /books/:id  (App.jsx 라우터에 연결)
 // - 주소의 :id 부분(예: /books/1 → 1)을 useParams()로 읽어서 그 책을 불러옴
 // - ‹ 도서 목록 → /books,  [수정] → /books/{id}/edit
-// - [삭제]는 삭제 담당이 onDelete로 연결 (받는 값: onDelete(book))
+// - [삭제]는 관리자와 도서 작성자에게만 표시
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import { useFetch } from '../api/useFetch';
+import DeleteBookDialog from '../components/DeleteBookDialog';
+import { canDeleteBook, getLoginUserId } from '../utils/bookPermissions';
 import './BookDetailPage.css';
 
 // 서버 주소는 각 파일에 적지 않고 .env의 VITE_API_URL 한 곳에서 관리 (useFetch가 붙여줌)
@@ -22,10 +24,11 @@ function formatDate(iso) {
   return `${d.getFullYear()}.${mm}.${dd}`;
 }
 
-export default function BookDetailPage({ onDelete = () => {} }) {
+export default function BookDetailPage() {
   const { id: bookId } = useParams();
   const navigate = useNavigate();
   const { request } = useFetch(); // 팀 공용 요청 도구
+  const { request: deleteBook, loading: deleting } = useFetch();
   const onBack = () => navigate('/books');
   const onEdit = () => navigate(`/books/${bookId}/edit`);
 
@@ -34,26 +37,47 @@ export default function BookDetailPage({ onDelete = () => {} }) {
   // status: 'loading'(불러오는 중) | 'done'(성공) | 'notFound'(없는 책) | 'error'(서버 오류)
   const [status, setStatus] = useState('loading');
   const [retry, setRetry] = useState(0);
+  const [deleteError, setDeleteError] = useState('');
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   useEffect(() => {
+    let ignore = false;
     async function load() {
       setStatus('loading');
+      setDeleteError('');
       try {
         const [bookData, genreData] = await Promise.all([
           request(`/books/${bookId}`),
           request('/genre').catch(() => []), // 장르를 못 불러와도 상세는 보여줌
         ]);
+        if (ignore) return;
         setBook(bookData);
         setGenres(genreData);
         setStatus('done');
       } catch (err) {
+        if (ignore) return;
         console.error(err);
         // useFetch는 실패하면 "요청 실패 (404)"처럼 상태 번호를 담아 알려줌 → 404면 없는 책
         setStatus(err.message.includes('404') ? 'notFound' : 'error');
       }
     }
     load();
+    return () => { ignore = true; };
   }, [bookId, retry, request]);
+
+  async function handleDelete() {
+    setConfirmingDelete(false);
+    // 표시 여부와 별개로, 요청을 보내기 직전에 현재 로그인 사용자도 다시 확인한다.
+    if (deleting || !canDeleteBook(getLoginUserId(), book) || String(book.ID) !== bookId) return;
+
+    setDeleteError('');
+    try {
+      await deleteBook(`/books/${encodeURIComponent(bookId)}`, { method: 'DELETE' });
+      navigate('/books', { replace: true });
+    } catch {
+      setDeleteError('도서를 삭제하지 못했어요. 잠시 후 다시 시도해 주세요.');
+    }
+  }
 
   if (status === 'loading') {
     return <div className="detail-state">도서 정보를 불러오는 중이에요…</div>;
@@ -85,9 +109,18 @@ export default function BookDetailPage({ onDelete = () => {} }) {
         <button type="button" className="detail-back" onClick={onBack}>‹ 도서 목록</button>
         <div className="detail-actions">
           <button type="button" className="detail-btn" onClick={onEdit}>수정</button>
-          <button type="button" className="detail-btn detail-btn-danger" onClick={() => onDelete(book)}>삭제</button>
+          {canDeleteBook(getLoginUserId(), book) && (
+            <button type="button" className="detail-btn detail-btn-danger" onClick={() => setConfirmingDelete(true)} disabled={deleting}>
+              {deleting ? '삭제 중…' : '삭제'}
+            </button>
+          )}
         </div>
       </div>
+
+      {deleteError && <p className="detail-delete-error" role="alert">{deleteError}</p>}
+      {confirmingDelete && (
+        <DeleteBookDialog title={book.TITLE} onCancel={() => setConfirmingDelete(false)} onConfirm={handleDelete} />
+      )}
 
       <section className="detail-card">
         <div className="detail-cover-area">
