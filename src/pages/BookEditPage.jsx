@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router';
 import BookForm from '../components/BookForm';
 import ImgGeneratorTab from '../components/ImgGeneratorTab';
+import "../styles/ImgGenerator.css";
 import { useFetch } from '../api/useFetch';
 
 // 로그인할 때 LoginPage가 저장한 사용자 정보 { id, userNm }
