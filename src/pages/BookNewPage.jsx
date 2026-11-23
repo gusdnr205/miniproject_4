@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import BookForm from '../components/BookForm';
 import { useFetch } from '../api/useFetch';
@@ -27,6 +27,15 @@ export default function BookNewPage() {
       .catch(() => {});
   }, [fetchGenres]);
 
+  // 로그인 안 했으면 팝업 → 로그인 화면으로 (책이 작성자 없이 저장되는 걸 막음)
+  const alerted = useRef(false); // 개발 모드에서 팝업이 두 번 뜨는 걸 막음
+  useEffect(() => {
+    if (loginUser.id || alerted.current) return;
+    alerted.current = true;
+    window.alert('로그인 후 도서를 등록할 수 있어요.');
+    navigate('/login', { replace: true });
+  }, [loginUser.id, navigate]);
+
   // 도서 등록: POST /books → 성공하면 새 도서 상세 화면으로 이동
   const handleSubmit = async (values) => {
     const now = new Date().toISOString();
@@ -47,6 +56,9 @@ export default function BookNewPage() {
       // 오류 문구는 saveError로 아래에 표시됨
     }
   };
+
+  // 로그인 화면으로 넘어가는 동안 폼을 그리지 않음
+  if (!loginUser.id) return null;
 
   return (
     <main className="book-form-page">
