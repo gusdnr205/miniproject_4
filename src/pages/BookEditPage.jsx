@@ -32,7 +32,15 @@ export default function BookEditPage() {
       .then((data) => {
         if (ignore) return;
         // 내 책만 수정 가능: 남의 책이면 팝업 → 목록으로
-        if (data.AUTHOR_ID !== getLoginUser().id) {
+        const loginId = getLoginUser().id;
+        // 로그인 안 했으면 팝업 → 로그인 화면으로
+        if (!loginId) {
+          window.alert('로그인 후 이용할 수 있어요.');
+          navigate('/login', { replace: true });
+          return;
+        }
+        // 내 책만 수정 가능: 남의 책이면 팝업 → 목록으로
+        if (data.AUTHOR_ID !== loginId) {
           window.alert('본인이 등록한 도서만 수정할 수 있어요.');
           navigate('/books', { replace: true });
           return;
