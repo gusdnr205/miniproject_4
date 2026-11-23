@@ -54,6 +54,7 @@ export default function BookNewPage() {
           UPDATED_AT: now,
         },
       });
+      window.alert('도서를 등록했어요.');
       navigate(`/books/${saved.ID}`);
     } catch {
       // 오류 문구는 saveError로 아래에 표시됨
