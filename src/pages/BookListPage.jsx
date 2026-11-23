@@ -6,9 +6,10 @@
 // - 카드 클릭 → /books/{책ID} (상세),  [새 도서 등록] → /books/new
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { useFetch } from '../api/useFetch';
 import './BookListPage.css';
 
-const API_URL = 'http://127.0.0.1:3000';
+// 서버 주소는 각 파일에 적지 않고 .env의 VITE_API_URL 한 곳에서 관리 (useFetch가 붙여줌)
 
 // "2026-11-20T00:00:00.000Z" → "2026.11.20"
 function formatDate(iso) {
@@ -36,7 +37,7 @@ function getStartDate(days) {
   return d.toISOString();
 }
 
-// API 명세서 기준 주소
+// API 명세서 기준 경로 (서버 주소 뒤에 붙는 부분)
 //   내 도서 목록 : /books?AUTHOR_ID={로그인ID}&_sort=CREATED_AT&_order=desc (최신 등록순)
 //   검색        : ...&q={검색어}
 //   장르 필터    : ...&GENRE={장르ID}  ("장르 전체"면 생략)
@@ -46,7 +47,7 @@ function buildBooksUrl(authorId, keyword, genre, days) {
   if (keyword) params.append('q', keyword);
   if (genre) params.append('GENRE', genre);
   if (days !== '') params.append('CREATED_AT_gte', getStartDate(days));
-  return `${API_URL}/books?${params.toString()}`;
+  return `/books?${params.toString()}`;
 }
 
 // 로그인한 사용자 아이디 꺼내기 (로그인 안 했으면 null)
@@ -60,6 +61,7 @@ function getLoginUserId() {
 
 export default function BookListPage() {
   const navigate = useNavigate();
+  const { request } = useFetch(); // 팀 공용 요청 도구
   const authorId = getLoginUserId();
   const openDetail = (id) => navigate(`/books/${id}`);
   const goCreate = () => navigate('/books/new');
@@ -80,11 +82,10 @@ export default function BookListPage() {
 
   // 장르 목록: 처음 한 번만
   useEffect(() => {
-    fetch(`${API_URL}/genre`)
-      .then((res) => (res.ok ? res.json() : []))
+    request('/genre')
       .then(setGenres)
       .catch(() => setGenres([]));
-  }, []);
+  }, [request]);
 
   // 책 목록: 처음 + 검색할 때마다
   useEffect(() => {
@@ -92,9 +93,7 @@ export default function BookListPage() {
     async function load() {
       setStatus('loading');
       try {
-        const res = await fetch(buildBooksUrl(authorId, filter.keyword, filter.genre, filter.days));
-        if (!res.ok) throw new Error('서버 응답 오류');
-        setBooks(await res.json());
+        setBooks(await request(buildBooksUrl(authorId, filter.keyword, filter.genre, filter.days)));
         setStatus('done');
       } catch (err) {
         console.error(err);
@@ -102,7 +101,7 @@ export default function BookListPage() {
       }
     }
     load();
-  }, [authorId, filter, retry]);
+  }, [authorId, filter, retry, request]);
 
   // 검색 (버튼 또는 Enter)
   const handleSearch = (e) => {
