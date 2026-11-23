@@ -2,21 +2,7 @@ import { useEffect, useState } from 'react'
 import ImgGeneratorKeywords from './ImgGeneratorKeywords'
 import ImgGenerator from './ImgGenerator';
 
-function ImgGeneratorTab() {
-  // 테스트용 임시 데이터, 이후에는 props로 받아와야 됨
-  const book = {
-    "ID": 1,
-    "TITLE": "별빛 아래의 서점",
-    "AUTHOR_NM": "관리자",
-    "AUTHOR_ID": "admin",
-    "CONTENT": "오래된 골목의 작은 서점에서 손님들이 남긴 기억이 밤마다 별빛으로 깨어난다.",
-    "COVER_IMAGE_URL": "",
-    "CREATED_AT": "2026-11-20T00:00:00.000Z",
-    "UPDATED_AT": "2026-11-20T00:00:00.000Z",
-    "GENRE": 1,
-    "id": "BWa_sLTYdH8"
-  }
-
+function ImgGeneratorTab({ book, label, onApply }) {
   const [isOpen, setIsOpen] = useState(false)
   const [apiKey, setApiKey] = useState('')
   const [keywords, setKeywords] = useState([])
@@ -43,7 +29,7 @@ function ImgGeneratorTab() {
         className='img-gen-trigger'
         onClick={() => setIsOpen(true)}
       >
-        AI 이미지 생성
+        {label}
       </button>
 
       {isOpen && (
@@ -83,7 +69,8 @@ function ImgGeneratorTab() {
                 </div>
                 <div>
                   <h3>표지 생성 키워드</h3>
-                  <ImgGeneratorKeywords onKeywordsChange={setKeywords} />
+                  <ImgGeneratorKeywords 
+                  title={book.TITLE} content={book.CONTENT} genre_code={book.GENRE} api_key={apiKey} onKeywordsChange={setKeywords} />
                 </div>
                 <div>
                   <h3>(선택) 추가 요청사항</h3>
@@ -133,7 +120,10 @@ function ImgGeneratorTab() {
               <button 
                 type='button'
                 className='img-gen-apply'
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  if (generatedCoverImage) onApply?.(generatedCoverImage)
+                  setIsOpen(false)
+                }}
               >
                 새 표지 적용
               </button>

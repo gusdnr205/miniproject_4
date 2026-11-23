@@ -30,44 +30,6 @@ function ImgGenerator({ title, author, content, cover_image_url, keywords, user_
 6. 제목이 제공되지 않았다면 임의의 제목이나 글자를 넣지 않는다. 글자가 없어도 표지가 완성도 있어 보이도록 구성한다.
 `.trim()
 
-  // // 1. OpenAI 이미지 생성 요청
-  // const res = await fetch(OPENAI_IMAGE_API_URL, {
-  //   method: 'POST',
-  //   headers: {
-  //     'Content-Type': 'application/json',
-  //     Authorization: `Bearer ${api_key}`,
-  //   },
-  //   body: JSON.stringify({
-  //     model: 'gpt-image-2',
-  //     prompt: prompt,
-  //     n: 1,
-  //     size: '1024x1536',
-  //     quality: 'auto',
-  //     output_format: 'png',
-  //   }),
-  // });
-
-  // if (!res.ok) throw new Error('OpenAI 요청 실패');
-
-  // // 2. OpenAI 응답 파싱 후 b64_json 추출
-  // const data = await res.json();
-  // const b64Json = data.data?.[0]?.b64_json;
-
-  // // b64_json을 Data URL 형태로 변환합니다.
-  // const imageSrc= `data:image/png;base64,${b64Json}`;
-
-  // // 3. json-server에 coverImageUrl만 PATCH
-  // // 바뀔 필드만 body에 담아 전송합니다.
-  // await fetch(`http://localhost:3000/books/${id}`, {
-  //   method: 'PATCH',
-  //   headers: {
-  //     'Content-Type': 'application/json',
-  //   },
-  //   body: JSON.stringify({
-  //     coverImageUrl: imageSrc,
-  //   }),
-  // });
-
   const generateImage = async () => {
     if (!api_key) {
       setError('OpenAI API Key를 입력해 주세요.')
