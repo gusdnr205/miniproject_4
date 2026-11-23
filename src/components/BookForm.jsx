@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import '../styles/BookForm.css';
 
+const TITLE_MAX = 100; // 제목 최대 글자 수 
 const CONTENT_MAX = 1000; // 책 소개 최대 글자 수
 
 // 도서 등록·수정 공용 폼
@@ -95,6 +96,7 @@ function BookForm({
               clearError('title');
             }}
             placeholder="도서 제목을 입력하세요"
+            maxLength={TITLE_MAX}
             aria-invalid={Boolean(errors.title)}
           />
 
