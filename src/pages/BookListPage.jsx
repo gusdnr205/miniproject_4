@@ -19,14 +19,33 @@ function formatDate(iso) {
   return `${d.getFullYear()}.${mm}.${dd}`;
 }
 
+// 표지 생성일 선택칸 목록 (days: 오늘부터 며칠 전까지 볼지, ''면 전체)
+const DATE_OPTIONS = [
+  { value: '', label: '표지 생성일: 전체 기간' },
+  { value: '0', label: '오늘' },
+  { value: '7', label: '최근 7일' },
+  { value: '30', label: '최근 30일' },
+  { value: '90', label: '최근 3개월' },
+];
+
+// "최근 7일" → 7일 전 0시 0분을 "2026-11-16T..." 형태로 바꿈
+function getStartDate(days) {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0); // 그날 0시부터
+  d.setDate(d.getDate() - Number(days));
+  return d.toISOString();
+}
+
 // API 명세서 기준 주소
 //   내 도서 목록 : /books?AUTHOR_ID={로그인ID}&_sort=CREATED_AT&_order=desc (최신 등록순)
 //   검색        : ...&q={검색어}
 //   장르 필터    : ...&GENRE={장르ID}  ("장르 전체"면 생략)
-function buildBooksUrl(authorId, keyword, genre) {
+//   표지 생성일  : ...&CREATED_AT_gte={시작 날짜}  (그 날짜 이후에 만든 책만, "전체"면 생략)
+function buildBooksUrl(authorId, keyword, genre, days) {
   const params = new URLSearchParams({ AUTHOR_ID: authorId, _sort: 'CREATED_AT', _order: 'desc' });
   if (keyword) params.append('q', keyword);
   if (genre) params.append('GENRE', genre);
+  if (days !== '') params.append('CREATED_AT_gte', getStartDate(days));
   return `${API_URL}/books?${params.toString()}`;
 }
 
@@ -51,8 +70,9 @@ export default function BookListPage() {
   // 입력 중인 값 (검색 버튼을 누르기 전)
   const [keywordInput, setKeywordInput] = useState('');
   const [genreInput, setGenreInput] = useState('');
+  const [dateInput, setDateInput] = useState('');
   // 실제로 검색에 쓰는 값 (검색 버튼을 누르면 바뀜)
-  const [filter, setFilter] = useState({ keyword: '', genre: '' });
+  const [filter, setFilter] = useState({ keyword: '', genre: '', days: '' });
 
   // status: 'loading' | 'done' | 'error'
   const [status, setStatus] = useState('loading');
@@ -72,7 +92,7 @@ export default function BookListPage() {
     async function load() {
       setStatus('loading');
       try {
-        const res = await fetch(buildBooksUrl(authorId, filter.keyword, filter.genre));
+        const res = await fetch(buildBooksUrl(authorId, filter.keyword, filter.genre, filter.days));
         if (!res.ok) throw new Error('서버 응답 오류');
         setBooks(await res.json());
         setStatus('done');
@@ -87,18 +107,19 @@ export default function BookListPage() {
   // 검색 (버튼 또는 Enter)
   const handleSearch = (e) => {
     e.preventDefault();
-    setFilter({ keyword: keywordInput.trim(), genre: genreInput });
+    setFilter({ keyword: keywordInput.trim(), genre: genreInput, days: dateInput });
   };
 
   // 검색 조건 지우고 전체 목록으로
   const resetSearch = () => {
     setKeywordInput('');
     setGenreInput('');
-    setFilter({ keyword: '', genre: '' });
+    setDateInput('');
+    setFilter({ keyword: '', genre: '', days: '' });
   };
 
   const genreNameOf = (code) => genres.find((g) => g.ID === Number(code))?.GENRE_NM ?? '';
-  const isFiltering = Boolean(filter.keyword || filter.genre);
+  const isFiltering = Boolean(filter.keyword || filter.genre || filter.days);
 
   // 목록 영역: 상황에 따라 다른 내용
   let content;
@@ -126,7 +147,7 @@ export default function BookListPage() {
       <div className="list-empty">
         <div className="list-empty-icon" aria-hidden="true">📖</div>
         <strong>{isFiltering ? '검색 결과가 없어요' : '첫 번째 도서를 등록해보세요'}</strong>
-        <p>{isFiltering ? '다른 검색어나 장르로 다시 찾아보세요.' : '등록한 도서는 여기에 카드로 모여요.'}</p>
+        <p>{isFiltering ? '다른 검색어나 장르, 날짜로 다시 찾아보세요.' : '등록한 도서는 여기에 카드로 모여요.'}</p>
         {isFiltering ? (
           <button type="button" className="list-btn list-btn-primary" onClick={resetSearch}>전체 목록 보기</button>
         ) : (
@@ -188,6 +209,11 @@ export default function BookListPage() {
           <option value="">장르 전체</option>
           {genres.map((g) => (
             <option key={g.ID} value={g.ID}>{g.GENRE_NM}</option>
+          ))}
+        </select>
+        <select className="list-input list-search-date" value={dateInput} onChange={(e) => setDateInput(e.target.value)}>
+          {DATE_OPTIONS.map((o) => (
+            <option key={o.value} value={o.value}>{o.label}</option>
           ))}
         </select>
         <button type="submit" className="list-btn list-btn-primary">검색</button>
