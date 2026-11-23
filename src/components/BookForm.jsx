@@ -56,9 +56,12 @@ function BookForm({
         <section className="book-form-fields">
           <h2 className="book-form-section">기본 정보</h2>
 
-          <label className="book-form-label" htmlFor="book-title">
-            제목 <span className="book-form-required">*</span>
-          </label>
+          <div className="book-form-label-row">
+            <label className="book-form-label" htmlFor="book-title">
+              제목 <span className="book-form-required">*</span>
+            </label>
+            {errors.title && <span className="book-form-error">{errors.title}</span>}
+          </div>
           <input
             id="book-title"
             className="book-form-input"
@@ -67,7 +70,6 @@ function BookForm({
             placeholder="도서 제목을 입력하세요"
             aria-invalid={Boolean(errors.title)}
           />
-          {errors.title && <p className="book-form-error">{errors.title}</p>}
 
           <div className="book-form-row">
             <div>
@@ -81,9 +83,12 @@ function BookForm({
               />
             </div>
             <div>
-              <label className="book-form-label" htmlFor="book-genre">
-                장르 <span className="book-form-required">*</span>
-              </label>
+              <div className="book-form-label-row">
+                <label className="book-form-label" htmlFor="book-genre">
+                  장르 <span className="book-form-required">*</span>
+                </label>
+                {errors.genre && <span className="book-form-error">{errors.genre}</span>}
+              </div>
               <select
                 id="book-genre"
                 className="book-form-input"
@@ -96,13 +101,15 @@ function BookForm({
                   <option key={g.ID} value={g.ID}>{g.GENRE_NM}</option>
                 ))}
               </select>
-              {errors.genre && <p className="book-form-error">{errors.genre}</p>}
             </div>
           </div>
 
-          <label className="book-form-label" htmlFor="book-content">
-            책 소개 <span className="book-form-required">*</span>
-          </label>
+          <div className="book-form-label-row">
+            <label className="book-form-label" htmlFor="book-content">
+              책 소개 <span className="book-form-required">*</span>
+            </label>
+            {errors.content && <span className="book-form-error">{errors.content}</span>}
+          </div>
           <textarea
             id="book-content"
             className="book-form-input book-form-textarea"
@@ -114,7 +121,6 @@ function BookForm({
             aria-invalid={Boolean(errors.content)}
           />
           <p className="book-form-count">{content.length} / {CONTENT_MAX}자</p>
-          {errors.content && <p className="book-form-error">{errors.content}</p>}
         </section>
 
         <section className="book-form-cover">
