@@ -7,7 +7,8 @@ function ImgGeneratorTab({ book, label, onApply }) {
   const [apiKey, setApiKey] = useState('')
   const [keywords, setKeywords] = useState([])
   const [userRequest, setUserRequest] = useState('')
-  const [generatedCoverImage, setGeneratedCoverImage] = useState(book.COVER_IMAGE_URL)
+  const [quality, setQuality] = useState('medium')
+  const [generatedCoverImage, setGeneratedCoverImage] = useState('')
 
   useEffect(() => {
     if (!isOpen) return undefined
@@ -74,20 +75,47 @@ function ImgGeneratorTab({ book, label, onApply }) {
                 </div>
                 <div>
                   <h3>(선택) 추가 요청사항</h3>
-                  <input
+                  <textarea
                     className='img-gen-input-userMessage'
                     value={userRequest}
                     onChange={(event) => setUserRequest(event.target.value)}
                   />
                 </div>
-                <ImgGenerator 
-                title={book.TITLE} author={book.AUTHOR_NM} content={book.CONTENT} cover_image_url={book.COVER_IMAGE_URL}
-                keywords={keywords} user_request={userRequest} button_text='신규 생성' api_key={apiKey} id={book.id}
-                onGenerated={setGeneratedCoverImage} />
-                <ImgGenerator 
-                title={book.TITLE} author={book.AUTHOR_NM} content={book.CONTENT} cover_image_url={book.COVER_IMAGE_URL}
-                keywords={keywords} user_request={userRequest} button_text='수정 요청' api_key={apiKey} id={book.id}
-                onGenerated={setGeneratedCoverImage} />
+                <div className='img-gen-actions'>
+                  <div className='img-gen-quality'>
+                    <span className='img-gen-quality-label'>품질</span>
+                    <strong>{quality}</strong>
+                    <div
+                      className='img-gen-quality-toggle'
+                      role='radiogroup'
+                      aria-label='이미지 생성 품질'
+                      style={{ '--quality-position': `${['low', 'medium', 'high'].indexOf(quality) * 50}%` }}
+                    >
+                      <span
+                        className='img-gen-quality-thumb'
+                        style={{ left: `${['low', 'medium', 'high'].indexOf(quality) * 50}%` }}
+                      />
+                      {['low', 'medium', 'high'].map((option) => (
+                        <button
+                          key={option}
+                          type='button'
+                          role='radio'
+                          aria-checked={quality === option}
+                          aria-label={`${option} 품질`}
+                          onClick={() => setQuality(option)}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <ImgGenerator 
+                  title={book.TITLE} author={book.AUTHOR_NM} content={book.CONTENT} cover_image_url={book.COVER_IMAGE_URL}
+                  keywords={keywords} user_request={userRequest} button_text='신규 생성' api_key={apiKey} id={book.id} quality={quality}
+                  onGenerated={setGeneratedCoverImage} />
+                  <ImgGenerator 
+                  title={book.TITLE} author={book.AUTHOR_NM} content={book.CONTENT} cover_image_url={book.COVER_IMAGE_URL}
+                  keywords={keywords} user_request={userRequest} button_text='수정 요청' api_key={apiKey} id={book.id} quality={quality}
+                  onGenerated={setGeneratedCoverImage} />
+                </div>
               </div>
 
               <div className='img-gen-compareImg'>
@@ -122,6 +150,7 @@ function ImgGeneratorTab({ book, label, onApply }) {
                 className='img-gen-apply'
                 onClick={() => {
                   if (generatedCoverImage) onApply?.(generatedCoverImage)
+                  setGeneratedCoverImage('')
                   setIsOpen(false)
                 }}
               >

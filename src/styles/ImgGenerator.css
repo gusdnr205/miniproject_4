@@ -1,16 +1,20 @@
-
-/* ImgGeneratorTab 용으로 임시 추가한 부분, 정리 필요*/
+/* AI 이미지 생성 모달 */
 .img-gen-trigger {
   border: 0;
-  border-radius: 6px;
+  border-radius: 7px;
   padding: 10px 18px;
   color: #fff;
   background: #176b55;
   cursor: pointer;
-  font-size: 15px;
+  font-size: 14px;
+  font-weight: 700;
+  transition: background-color 160ms ease, transform 160ms ease;
 }
 
-.img-gen-trigger:hover { background: #125741; }
+.img-gen-trigger:hover {
+  background: #125741;
+  transform: translateY(-1px);
+}
 
 .img-gen-backdrop {
   position: fixed;
@@ -23,10 +27,12 @@
 }
 
 .img-gen-modal {
-  width: min(1200px, 100%);
-  height: min(720px, 100%);
-  min-height: 360px;
+  display: flex;
+  flex-direction: column;
+  width: min(960px, 100%);
+  max-height: min(680px, calc(100vh - 48px));
   overflow: hidden;
+  border: 1px solid #e2ebe7;
   border-radius: 16px;
   background: #fff;
   box-shadow: 0 20px 60px rgb(0 0 0 / 24%);
@@ -37,16 +43,21 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  padding: 26px 30px 22px;
+  padding: 24px 28px 20px;
   border-bottom: 1px solid #e5ece9;
 }
 
-.img-gen-modal-header h2 { margin: 0; font-size: 22px; }
+.img-gen-modal-header h2 {
+  margin: 0;
+  color: #20332e;
+  font-size: 21px;
+  letter-spacing: -0.02em;
+}
 
 .img-gen-modal-header p {
-  margin: 8px 0 0;
+  margin: 7px 0 0;
   color: #7b8b86;
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .img-gen-close {
@@ -55,29 +66,78 @@
   color: #71817c;
   background: transparent;
   cursor: pointer;
-  font-size: 26px;
+  font-size: 24px;
   line-height: 1;
 }
 
-.img-gen-close:hover { color: #20332e; }
+.img-gen-close:hover {
+  color: #20332e;
+}
 
-.img-gen-modal-body { 
-  min-height: 270px; 
+.img-gen-modal-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(390px, 1.05fr);
+  gap: 28px;
+  min-height: 0;
+  padding: 24px 28px;
+  overflow: auto;
+}
+
+.img-gen-input {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 22px;
+  min-width: 0;
+  padding-right: 28px;
+  border-right: 1px solid #e5ece9;
 }
 
-.img-gen-showImg {
-  width: 220px;
+.img-gen-input h3,
+.img-gen-showImg h3 {
+  margin: 0 0 9px;
+  color: #30433e;
+  font-size: 12px;
+  font-weight: 700;
 }
 
-.img-gen-cover {
-  display: block;
+.hidden-input,
+.img-gen-input-userMessage,
+.img-gen-keywords-add input {
+  box-sizing: border-box;
   width: 100%;
-  aspect-ratio: 3 / 4;
-  border-radius: 8px;
-  background: #eef1f0;
-  object-fit: cover;
+  border: 1px solid #dbe5e1;
+  border-radius: 7px;
+  color: #20332e;
+  background: #fff;
+  font: inherit;
+  outline: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.hidden-input {
+  height: 38px;
+  padding: 0 11px;
+}
+
+.hidden-input:focus,
+.img-gen-input-userMessage:focus,
+.img-gen-keywords-add input:focus {
+  border-color: #6fae9c;
+  box-shadow: 0 0 0 3px rgb(23 107 85 / 10%);
+}
+
+.img-gen-input > div > p:not([role='alert']) {
+  margin: 7px 0 0;
+  color: #91a09b;
+  font-size: 11px;
+}
+
+.img-gen-input-userMessage {
+  display: block;
+  min-height: 112px;
+  padding: 10px 11px;
+  line-height: 1.5;
+  resize: none;
 }
 
 .img-gen-keywords {
@@ -85,18 +145,19 @@
   flex-wrap: wrap;
   gap: 6px;
   min-height: 28px;
-  margin: 10px 0;
+  margin: 0 0 10px;
 }
 
 .img-gen-keyword {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  padding: 5px 10px;
+  padding: 5px 9px;
   border-radius: 999px;
   color: #176b55;
   background: #e5f1ed;
-  font-size: 12px;
+  font-size: 11px;
+  line-height: 1;
 }
 
 .img-gen-keyword-remove {
@@ -111,7 +172,7 @@
   color: #176b55;
   background: transparent;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1;
 }
 
@@ -123,42 +184,240 @@
 .img-gen-keywords-add {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 7px;
 }
 
 .img-gen-keywords-add p {
+  flex: 0 0 auto;
   margin: 0;
   color: #71817c;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .img-gen-keywords-add input {
   min-width: 0;
-  flex: 1;
-  padding: 8px 10px;
-  border: 1px solid #dbe5e1;
-  border-radius: 6px;
+  height: 32px;
+  padding: 0 9px;
+  font-size: 12px;
 }
 
 .img-gen-keywords-add button {
-  border: 0;
+  flex: 0 0 auto;
+  border: 1px solid #cfe2db;
   border-radius: 6px;
-  padding: 8px 12px;
+  padding: 7px 11px;
+  color: #176b55;
+  background: #f4faf7;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.img-gen-keywords-add button:hover {
+  background: #e5f1ed;
+}
+
+.img-gen-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  width: 100%;
+}
+
+.img-gen-actions > div {
+  flex: 0 0 auto;
+}
+
+.img-gen-actions button {
+  border: 0;
+  border-radius: 7px;
+  padding: 9px 13px;
   color: #fff;
   background: #176b55;
   cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
 }
 
-.img-gen-input-userMessage {
-  width: 300px;
-  height: 200px;
+.img-gen-actions button:hover {
+  background: #125741;
+}
+
+.img-gen-actions button:disabled {
+  background: #a9bcb5;
+  cursor: wait;
+}
+
+.img-gen-actions p[role='alert'] {
+  margin: 9px 0 0;
+  color: #bb4f4f;
+  font-size: 11px;
 }
 
 .img-gen-compareImg {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 8px;
+}
+
+.img-gen-showImg {
+  min-width: 0;
+}
+
+.img-gen-showImg h3 {
+  padding-left: 2px;
+}
+
+.img-gen-cover {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  border: 1px solid #e0e8e5;
+  border-radius: 8px;
+  background: #eef1f0;
+  object-fit: cover;
 }
 
 .img-gen-modal-footer {
   display: flex;
   justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 28px 16px;
+  border-top: 1px solid #e5ece9;
+}
+
+.img-gen-modal-footer button {
+  min-width: 70px;
+  border-radius: 7px;
+  padding: 9px 14px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.img-gen-cancel {
+  border: 1px solid #d5e2dd;
+  color: #527169;
+  background: #fff;
+}
+
+.img-gen-cancel:hover {
+  background: #f5f9f7;
+}
+
+.img-gen-apply {
+  border: 1px solid #176b55;
+  color: #fff;
+  background: #176b55;
+}
+
+.img-gen-apply:hover {
+  background: #125741;
+}
+
+@media (max-width: 720px) {
+  .img-gen-backdrop {
+    padding: 12px;
+  }
+
+  .img-gen-modal {
+    max-height: calc(100vh - 24px);
+  }
+
+  .img-gen-modal-body {
+    grid-template-columns: 1fr;
+    gap: 24px;
+  }
+
+  .img-gen-input {
+    padding-right: 0;
+    padding-bottom: 24px;
+    border-right: 0;
+    border-bottom: 1px solid #e5ece9;
+  }
+}
+
+.img-gen-quality {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  min-width: 120px;
+  margin-right: 8px;
+}
+
+.img-gen-quality-label {
+  color: #71817c;
+  font-size: 10px;
+}
+
+.img-gen-quality strong {
+  color: #30433e;
+  font-size: 13px;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+
+.img-gen-quality-toggle {
+  position: relative;
+  width: 120px;
+  height: 28px;
+  border-radius: 999px;
+  background: linear-gradient(
+    to right,
+    #3b82f6 var(--quality-position),
+    #e1e2e5 var(--quality-position)
+  );
+}
+
+.img-gen-quality-thumb {
+  position: absolute;
+  top: 2px;
+  z-index: 1;
+  width: 24px;
+  height: 24px;
+  border: 1px solid #d9dce1;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 16%);
+  transform: translateX(-50%);
+  transition: left 160ms ease;
+}
+
+.img-gen-quality-toggle button {
+  position: absolute;
+  top: 0;
+  z-index: 2;
+  width: 33.333%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  color: transparent;
+  background: transparent;
+  cursor: pointer;
+}
+
+.img-gen-quality-toggle button:nth-of-type(1) {
+  left: 0;
+}
+
+.img-gen-quality-toggle button:nth-of-type(2) {
+  left: 33.333%;
+}
+
+.img-gen-quality-toggle button:nth-of-type(3) {
+  left: 66.666%;
+}
+
+.img-gen-quality-toggle button:hover,
+.img-gen-quality-toggle button:disabled {
+  background: transparent;
+}
+
+.img-gen-quality-toggle button:focus-visible {
+  outline: 2px solid #176b55;
+  outline-offset: 2px;
 }

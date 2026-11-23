@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import db from '../../db.json'
 
 function ImgGeneratorKeywords({ title, content, genre_code, api_key, onKeywordsChange }) {
+  const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
   const [keyword, setKeyword] = useState('')
   const [keywords, setKeywords] = useState([])
   const [isExtracting, setIsExtracting] = useState(false)
@@ -21,7 +22,7 @@ function ImgGeneratorKeywords({ title, content, genre_code, api_key, onKeywordsC
       setExtractError('')
 
       try {
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+        const response = await fetch(OPENAI_API_URL, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
