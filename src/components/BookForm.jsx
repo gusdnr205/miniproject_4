@@ -29,6 +29,11 @@ function BookForm({
   const [content, setContent] = useState(initialBook?.CONTENT ?? '');
   const [errors, setErrors] = useState({});
 
+  // 입력하면 그 칸의 오류 문구만 바로 지움
+  const clearError = (field) => {
+    setErrors((prev) => ({ ...prev, [field]: undefined }));
+  };
+
   // 유효성 검사: 제목·장르·책 소개는 필수 (공백만 입력도 안 됨)
   const validate = () => {
     const next = {};
@@ -66,7 +71,10 @@ function BookForm({
             id="book-title"
             className="book-form-input"
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={(e) => {
+              setTitle(e.target.value);
+              clearError('title');
+            }}
             placeholder="도서 제목을 입력하세요"
             aria-invalid={Boolean(errors.title)}
           />
@@ -93,7 +101,10 @@ function BookForm({
                 id="book-genre"
                 className="book-form-input"
                 value={genre}
-                onChange={(e) => setGenre(e.target.value)}
+                onChange={(e) => {
+                  setGenre(e.target.value);
+                  clearError('genre');
+                }}
                 aria-invalid={Boolean(errors.genre)}
               >
                 <option value="">장르를 선택하세요</option>
@@ -114,7 +125,10 @@ function BookForm({
             id="book-content"
             className="book-form-input book-form-textarea"
             value={content}
-            onChange={(e) => setContent(e.target.value)}
+            onChange={(e) => {
+              setContent(e.target.value);
+              clearError('content');
+            }}
             placeholder="도서 내용을 입력하세요"
             rows={6}
             maxLength={CONTENT_MAX}
