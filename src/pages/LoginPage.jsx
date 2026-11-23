@@ -3,6 +3,19 @@ import "../styles/LoginPage.css";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://127.0.0.1:3000";
 
+// ★ 로그인 잠금 설정: 5번 틀리면 30초 잠금
+const MAX_FAIL = 5;
+const LOCK_MS = 30 * 1000;
+
+// ★ 저장된 실패 횟수와 잠금 해제 시각 꺼내기 (새로고침해도 유지)
+function getLock() {
+  try {
+    return JSON.parse(localStorage.getItem("loginLock")) ?? { fail: 0, until: 0 };
+  } catch {
+    return { fail: 0, until: 0 };
+  }
+}
+
 export default function LoginPage({ onLogin }) {
   const [userId, setUserId] = useState("");
   const [password, setPassword] = useState("");
@@ -18,6 +31,14 @@ export default function LoginPage({ onLogin }) {
       return;
     }
 
+    // ★ 잠금 중이면 요청하지 않고 남은 시간 안내
+    const lock = getLock();
+    if (Date.now() < lock.until) {
+      const sec = Math.ceil((lock.until - Date.now()) / 1000);
+      setError(`로그인 시도가 너무 많아요. ${sec}초 후에 다시 시도해주세요.`);
+      return;
+    }
+
     setLoading(true);
     try {
       const res = await fetch(
@@ -27,9 +48,23 @@ export default function LoginPage({ onLogin }) {
       const users = await res.json();
 
       if (users.length === 0) {
-        setError("아이디 또는 비밀번호가 맞지 않아요.");
+        // ★ 실패 횟수 올리고, 5번째면 30초 잠금
+        const fail = lock.fail + 1;
+        const locked = fail >= MAX_FAIL;
+        localStorage.setItem(
+          "loginLock",
+          JSON.stringify({ fail: locked ? 0 : fail, until: locked ? Date.now() + LOCK_MS : 0 })
+        );
+        setError(
+          locked
+            ? `${MAX_FAIL}번 틀려서 30초 동안 로그인할 수 없어요.`
+            : `아이디 또는 비밀번호가 맞지 않아요. (${fail}/${MAX_FAIL})`
+        );
         return;
       }
+
+      // ★ 로그인 성공하면 실패 기록 초기화
+      localStorage.removeItem("loginLock");
 
       // 비밀번호는 빼고 저장
       const loginUser = { id: users[0].ID, userNm: users[0].USER_NM };
