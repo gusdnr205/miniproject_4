@@ -22,6 +22,7 @@ function BookForm({
   submitting = false,
   cover = null,
   onDelete = null,
+  coverDirty = false,
 }) {
   const isEdit = Boolean(initialBook);
   const [title, setTitle] = useState(initialBook?.TITLE ?? '');
@@ -56,7 +57,7 @@ function BookForm({
     title !== initial.title ||
     authorNm !== initial.authorNm ||
     String(genre) !== initial.genre ||
-    content !== initial.content;
+    content !== initial.content || coverDirty;
 
   // 취소: 고친 게 있을 때만 한 번 물어봄
   const handleCancel = () => {

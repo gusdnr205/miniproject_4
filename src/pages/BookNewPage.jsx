@@ -89,6 +89,7 @@ export default function BookNewPage() {
         genres={genres}
         defaultAuthor={loginUser.userNm ?? ''}
         cover={renderCover}
+        coverDirty={coverUrl !== ''}
         onSubmit={handleSubmit}
         onCancel={() => navigate('/books')}
         submitting={saving}

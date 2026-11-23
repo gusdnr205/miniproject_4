@@ -123,6 +123,7 @@ export default function BookEditPage() {
         genres={genres}
         initialBook={book}
         cover={cover}
+        coverDirty={coverChanged}
         onSubmit={handleSubmit}
         onCancel={() => navigate(`/books/${id}`)}
         onDelete={handleDelete}
