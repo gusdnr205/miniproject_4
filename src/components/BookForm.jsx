@@ -95,7 +95,7 @@ function BookForm({
               setTitle(e.target.value);
               clearError('title');
             }}
-            placeholder="도서 제목을 입력하세요"
+            placeholder="도서 제목을 입력하세요 (100자 이내)"
             maxLength={TITLE_MAX}
             aria-invalid={Boolean(errors.title)}
           />
