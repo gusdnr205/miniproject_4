@@ -177,6 +177,13 @@
   color: var(--color-primary, #1d6b50);
 }
 
+.book-form-count {
+  margin-top: 4px;
+  font-size: 12px;
+  text-align: right;
+  color: var(--color-sub, #5f6661);
+}
+
 /* 폼 폭이 720px보다 좁으면: 표지를 아래로 내리고 한 줄로 쌓기 */
 @container (max-width: 720px) {
   .book-form-card {

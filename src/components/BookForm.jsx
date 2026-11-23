@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import '../styles/BookForm.css';
 
+const CONTENT_MAX = 1000; // 책 소개 최대 글자 수
+
 // 도서 등록·수정 공용 폼
 // genres: 장르 목록 (GET /genre 결과)
 // initialBook: 수정할 때 기존 도서 (등록이면 생략)
@@ -108,8 +110,10 @@ function BookForm({
             onChange={(e) => setContent(e.target.value)}
             placeholder="도서 내용을 입력하세요"
             rows={6}
+            maxLength={CONTENT_MAX}
             aria-invalid={Boolean(errors.content)}
           />
+          <p className="book-form-count">{content.length} / {CONTENT_MAX}자</p>
           {errors.content && <p className="book-form-error">{errors.content}</p>}
         </section>
 
