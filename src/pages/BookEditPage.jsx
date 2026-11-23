@@ -4,6 +4,15 @@ import BookForm from '../components/BookForm';
 import ImgGeneratorTab from '../components/ImgGeneratorTab';
 import { useFetch } from '../api/useFetch';
 
+// 로그인할 때 LoginPage가 저장한 사용자 정보 { id, userNm }
+function getLoginUser() {
+  try {
+    return JSON.parse(localStorage.getItem('loginUser')) ?? {};
+  } catch {
+    return {};
+  }
+}
+
 // 도서 수정 페이지 (/books/:id/edit)
 export default function BookEditPage() {
   const { id } = useParams();
@@ -16,10 +25,17 @@ export default function BookEditPage() {
   const { request: fetchGenres } = useFetch();
   const { request: saveBook, loading: saving, error: saveError } = useFetch();
 
-  // 기존 도서 불러오기: GET /books/{ID}, 장르 목록: GET /genre
   useEffect(() => {
+    let ignore = false; // 개발 모드에서 두 번 실행될 때 팝업이 두 번 뜨는 걸 막음
     fetchBook(`/books/${id}`)
       .then((data) => {
+        if (ignore) return;
+        // 내 책만 수정 가능: 남의 책이면 팝업 → 목록으로
+        if (data.AUTHOR_ID !== getLoginUser().id) {
+          window.alert('본인이 등록한 도서만 수정할 수 있어요.');
+          navigate('/books', { replace: true });
+          return;
+        }
         setBook(data);
         setCoverUrl(data.COVER_IMAGE_URL ?? '');
       })
@@ -27,7 +43,10 @@ export default function BookEditPage() {
     fetchGenres('/genre')
       .then(setGenres)
       .catch(() => {});
-  }, [id, fetchBook, fetchGenres]);
+    return () => {
+      ignore = true;
+    };
+  }, [id, fetchBook, fetchGenres, navigate]);
 
   // 저장: PATCH /books/{ID} → 상세 화면으로 이동
   const handleSubmit = async (values) => {

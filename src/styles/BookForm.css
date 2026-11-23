@@ -4,6 +4,8 @@
   margin: 0 auto;
   text-align: left;
   container-type: inline-size; /* 폼 자신의 폭을 기준으로 배치를 바꿈 */
+  color-scheme: light; /* 다크 모드에서도 입력칸을 밝게 유지 */
+  color: var(--color-text, #1f2a24); /* 흰 카드 위 글자색 고정 (다크 모드 대비) */
 }
 
 .book-form-page {
@@ -36,6 +38,7 @@
 .book-form-section {
   margin-bottom: 16px;
   font-size: 20px;
+  color: var(--color-text, #1f2a24);
 }
 
 .book-form-label {
