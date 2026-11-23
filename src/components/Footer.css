@@ -1,12 +1,12 @@
 /* 푸터를 화면 맨 아래에 고정하는 레이아웃
-   #root를 세로 flex로 만들고, main이 남는 공간을 모두 차지하게 함
+   #root를 세로 flex로 만들고, 도서 화면 영역이 남는 공간을 모두 차지하게 함
    → 내용이 짧아도 푸터가 아래에 붙음 */
 #root {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
 }
-main {
+.book-layout-content {
   flex: 1;
 }
 
