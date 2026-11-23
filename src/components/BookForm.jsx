@@ -44,6 +44,25 @@ function BookForm({
     return Object.keys(next).length === 0;
   };
 
+  // 처음 값과 지금 값이 하나라도 다르면 "고친 게 있음"
+  const initial = {
+    title: initialBook?.TITLE ?? '',
+    authorNm: initialBook?.AUTHOR_NM ?? defaultAuthor,
+    genre: String(initialBook?.GENRE ?? ''),
+    content: initialBook?.CONTENT ?? '',
+  };
+  const isDirty =
+    title !== initial.title ||
+    authorNm !== initial.authorNm ||
+    String(genre) !== initial.genre ||
+    content !== initial.content;
+
+  // 취소: 고친 게 있을 때만 한 번 물어봄
+  const handleCancel = () => {
+    if (isDirty && !window.confirm('작성 중인 내용이 사라져요. 나갈까요?')) return;
+    onCancel();
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!validate()) return;
@@ -159,7 +178,7 @@ function BookForm({
             삭제
           </button>
         )}
-        <button type="button" className="book-form-button book-form-cancel" onClick={onCancel}>
+        <button type="button" className="book-form-button book-form-cancel" onClick={handleCancel}>
           취소
         </button>
         <button type="submit" className="book-form-button book-form-submit" disabled={submitting}>
