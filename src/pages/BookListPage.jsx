@@ -37,14 +37,10 @@ export default function BookListPage() {
     load();
   }, [request]); // request가 바뀔 때만 다시 실행 (useFetch가 고정해 두어 사실상 한 번만 실행됨)
 
-  // Header 메뉴 클릭 시 호출: 'create'면 등록 화면, 그 외엔 목록 화면으로 이동
-  const handleNavigate = (page) => {
-    navigate(page === 'create' ? '/books/new' : '/books');
-  };
 
   return (
     <>
-      <Header currentPage="list" onNavigate={handleNavigate} />
+      <Header />
       <main>
         {loading && <p>불러오는 중...</p>}
         {error && <p>에러: {error}</p>}
