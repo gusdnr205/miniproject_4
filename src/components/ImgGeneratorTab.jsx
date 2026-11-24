@@ -108,12 +108,12 @@ function ImgGeneratorTab({ book, label, onApply }) {
                     </div>
                   </div>
                   <ImgGenerator 
-                  title={book.TITLE} author={book.AUTHOR_NM} content={book.CONTENT} cover_image_url={book.COVER_IMAGE_URL}
-                  keywords={keywords} user_request={userRequest} button_text='신규 생성' api_key={apiKey} id={book.id} quality={quality}
+                  title={book.TITLE} author={book.AUTHOR_NM} content={book.CONTENT} cover_image_url=''
+                  keywords={keywords} user_request={userRequest} button_text='신규 생성' api_key={apiKey} quality={quality}
                   onGenerated={setGeneratedCoverImage} />
                   <ImgGenerator 
                   title={book.TITLE} author={book.AUTHOR_NM} content={book.CONTENT} cover_image_url={book.COVER_IMAGE_URL}
-                  keywords={keywords} user_request={userRequest} button_text='수정 요청' api_key={apiKey} id={book.id} quality={quality}
+                  keywords={keywords} user_request={userRequest} button_text='수정 요청' api_key={apiKey} quality={quality}
                   onGenerated={setGeneratedCoverImage} />
                 </div>
               </div>

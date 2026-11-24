@@ -1,7 +1,12 @@
 import { useState } from 'react'
 
-function ImgGenerator({ title, author, content, cover_image_url, keywords, user_request, button_text, api_key, id, quality, onGenerated }) {
-  const OPENAI_IMAGE_API_URL = 'https://api.openai.com/v1/images/generations';
+function ImgGenerator({ title, author, content, cover_image_url, keywords, user_request, button_text, api_key, quality, onGenerated }) {
+  let OPENAI_IMAGE_API_URL = 'https://api.openai.com/v1/images';
+  if (cover_image_url) {
+    OPENAI_IMAGE_API_URL += '/edits';
+  } else {
+    OPENAI_IMAGE_API_URL += '/generations';
+  }
   const [isGenerating, setIsGenerating] = useState(false)
   const [error, setError] = useState('')
 
@@ -19,7 +24,6 @@ function ImgGenerator({ title, author, content, cover_image_url, keywords, user_
 - 책 소개: ${content}
 - 키워드: ${keywords}
 - 사용자의 추가 요청: ${user_request}
-- 기존 표지 이미지 (base64 url 형식): ${cover_image_url}  // 있을 수도 있고 없을 수도 있음
 
 # 표지 디자인 원칙
 1. 결과물은 책의 앞표지 한 장이다. 기본 비율은 세로형 2:3으로 구성한다.
@@ -40,20 +44,26 @@ function ImgGenerator({ title, author, content, cover_image_url, keywords, user_
     setError('')
 
     try {
+      const requestBody = {
+        model: 'gpt-image-2',
+        prompt: prompt,
+        n: 1,
+        size: '1024x1536',
+        quality,
+        output_format: 'png',
+      }
+
+      if (cover_image_url) {
+        requestBody.images = [{ image_url: cover_image_url }]
+      }
+
       const res = await fetch(OPENAI_IMAGE_API_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${api_key}`,
         },
-        body: JSON.stringify({
-          model: 'gpt-image-2',
-          prompt,
-          n: 1,
-          size: '1024x1536',
-          quality,
-          output_format: 'png',
-        }),
+        body: JSON.stringify(requestBody),
       })
 
       if (!res.ok) throw new Error('OpenAI 이미지 생성 요청에 실패했습니다.')
@@ -83,7 +93,5 @@ function ImgGenerator({ title, author, content, cover_image_url, keywords, user_
     </div>
   )
 }
-
-
 
 export default ImgGenerator
