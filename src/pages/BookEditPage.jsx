@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router';
 import BookForm from '../components/BookForm';
 import ImgGeneratorTab from '../components/ImgGeneratorTab';
 import "../styles/ImgGenerator.css";
+import DeleteBookDialog from '../components/DeleteBookDialog';
 import { useFetch } from '../api/useFetch';
 
 // 로그인할 때 LoginPage가 저장한 사용자 정보 { id, userNm }
@@ -21,6 +22,7 @@ export default function BookEditPage() {
   const [book, setBook] = useState(null);
   const [genres, setGenres] = useState([]);
   const [coverUrl, setCoverUrl] = useState(''); // 화면에 보이는 표지 (AI로 새로 만들면 여기만 바뀜)
+  const [confirmingDelete, setConfirmingDelete] = useState(false); // 삭제 확인창 열림 여부
 
   const { request: fetchBook, loading: loadingBook, error: bookError } = useFetch();
   const { request: fetchGenres } = useFetch();
@@ -76,9 +78,8 @@ export default function BookEditPage() {
   };
 
   // 삭제: DELETE /books/{ID} → 목록으로 이동
-  // (확인 창은 삭제 담당이 공통 모달을 만들면 그걸로 바꾸면 됨)
   const handleDelete = async () => {
-    if (!window.confirm(`'${book.TITLE}'을(를) 삭제할까요? 삭제하면 되돌릴 수 없어요.`)) return;
+    setConfirmingDelete(false);
     try {
       await saveBook(`/books/${id}`, { method: 'DELETE' });
       window.alert('도서를 삭제했어요.');
@@ -129,6 +130,13 @@ export default function BookEditPage() {
     <main className="book-form-page">
       <h1 className="book-form-title">도서 수정</h1>
       {saveError && <p className="book-form-error" role="alert">처리하지 못했어요. 잠시 후 다시 시도해 주세요.</p>}
+      {confirmingDelete && (
+        <DeleteBookDialog
+          title={book.TITLE}
+          onCancel={() => setConfirmingDelete(false)}
+          onConfirm={handleDelete}
+        />
+      )}
       <BookForm
         genres={genres}
         initialBook={book}
@@ -136,7 +144,7 @@ export default function BookEditPage() {
         coverDirty={coverChanged}
         onSubmit={handleSubmit}
         onCancel={() => navigate(`/books/${id}`)}
-        onDelete={handleDelete}
+        onDelete={setConfirmingDelete(true)}
         submitting={saving}
       />
     </main>
