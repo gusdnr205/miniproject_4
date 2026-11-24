@@ -1,42 +1,6 @@
-# React + Vite
-
-## 로컬 조회 API
-
-프로젝트 루트에서 `npm ci`로 의존성을 설치한 뒤 `npm run dev:api`를 실행합니다. React 개발 서버는 다른 터미널에서 `npm run dev`로 실행할 수 있습니다.
-
-기본 주소는 `http://127.0.0.1:3000`입니다. React에서 사용할 API 주소는 `.env`의 `VITE_API_URL`로 설정합니다.
-
-| GET 경로 | 용도 |
-| --- | --- |
-| `/books` | 전체 도서 목록 |
-| `/books/1` | 숫자 `ID`로 도서 한 권 조회 |
-| `/books?AUTHOR_ID=demo-seoyun&GENRE=1` | 작성자와 장르로 필터링 |
-| `/user?USER_ID=demo-seoyun` | 샘플 유저 조회 |
-| `/genre` | 장르 전체 조회 |
-| `/genre?GENRE_CODE=1` | 장르 코드로 조회 |
-
-`db.json`의 도서 `GENRE`는 장르의 `GENRE_CODE`와 연결됩니다. 샘플 유저의 `PASSWORD`와 도서의 `COVER_IMAGE_URL`은 빈 문자열입니다. 이 서버에서는 GET 조회만 지원합니다.
-
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
-
-
-
 # 창작자를 위한 도서관리시스템
 
-> 도서를 등록·관리하고, 도서 내용에 어울리는 표지를 AI로 생성하는 웹 애플리케이션 (Frontend)
+> 창작자가 도서를 등록·관리하고, 도서 내용에 어울리는 표지를 AI로 생성하는 웹 애플리케이션 (Frontend)
 
 ## 프로젝트 개요
 
@@ -54,10 +18,10 @@ If you are developing a production application, we recommend using TypeScript wi
 | 로그인 | 아이디·비밀번호 로그인, 헤더에 유저 이름 표시와 로그아웃 |
 | 도서 목록 | 카드 목록, 검색어·장르·등록일 기간 필터, 최신 등록순 정렬, 로딩·에러·빈 목록 안내 |
 | 도서 등록 | 제목·작가·장르·책 소개 입력, 필수값 검증, 작성자는 로그인 정보로 자동 입력 |
-| 도서 상세 | 표지, 작성일·수정일, 본문 조회 |
-| 도서 수정 | 기존 정보를 불러와 수정 |
+| 도서 상세 | 각 BookCard에 대해 표지, 작성일·수정일, 본문 조회 |
+| 도서 수정 | 사용자 본인이 등록한 도서 기존 정보를 불러와 수정 |
 | 도서 삭제 | 목록에서 여러 권 선택 삭제, 상세에서 단건 삭제, 삭제 전 확인, 권한에 따른 삭제 제어 |
-| AI 표지 생성 | 수정 화면에서 도서 정보와 키워드로 OpenAI 이미지 생성 **(구현 중)** |
+| AI 표지 생성 | 등록·수정 화면에서 도서 정보와 키워드로 OpenAI 표지 이미지 생성 |
 
 ## 기술 스택
 
@@ -149,12 +113,11 @@ npm run dev
 
 제목·장르·책 소개는 필수이며, 공백만 입력하면 안내 문구가 나옵니다. 수정 화면에서는 기존 정보가 미리 채워집니다.
 
-### AI 표지 생성 (구현 중)
+### AI 표지 생성 
 
-<!-- 📸 수정 화면의 AI 이미지 생성 팝업 (생성 전·후 비교가 보이면 가장 좋음) → docs/images/ai-cover.png -->
-<!-- ![AI 표지 생성](src/assets/ai-cover.png) -->
+![AI 표지 생성](src/assets/ai-cover.png)
 
-수정 화면의 **AI 이미지 생성** 버튼으로 팝업을 열어 표지를 만듭니다.
+등록·수정 화면의 **AI 이미지 생성** 버튼으로 팝업을 열어 표지를 만듭니다.
 
 1. OpenAI API Key를 입력합니다. 키는 화면 상태로만 보관하며 새로고침하면 지워집니다.
 2. 표지에 담고 싶은 키워드를 직접 입력하고, 필요하면 추가 요청사항을 적습니다.
@@ -190,7 +153,8 @@ API Key는 코드나 `db.json`에 저장하지 않습니다.
 ```text
 src/
 ├─ api/          useFetch.js            공통 API 요청 훅
-├─ components/   Header, Footer, BookForm, DeleteBookDialog, ImgGenerator* ...
+├─ assets/       ai-cover.png, book-delete.png, book-detail.png ...       
+├─ components/   Header, Footer, BookForm, DeleteBookDialog, ImgGenerator ...
 ├─ pages/        LoginPage, BookListPage, BookDetailPage, BookNewPage, BookEditPage
 ├─ styles/       화면·컴포넌트별 CSS
 ├─ utils/        bookPermissions.js     로그인 유저 확인, 삭제 권한 판단
@@ -229,10 +193,10 @@ src/
 | 쿼리 | 용도 |
 | --- | --- |
 | `AUTHOR_ID` | 작성자별 조회 (일반 사용자는 본인 ID, 관리자는 생략) |
-| `q` | 검색어 |
+| 화면 내 검색 | 조회된 도서 목록을 대상으로 제목(TITLE) 및 저자명(AUTHOR_NM) 기준 부분 일치 검색 |
 | `GENRE` | 장르 필터 |
 | `CREATED_AT_gte` | 등록일 기간 필터 (시작 날짜 이후) |
-| `_sort`, `_order` | 정렬 (`CREATED_AT`, `desc`) |
+| `_sort`, `_order` | 조회 결과 정렬 (`CREATED_AT`, `desc`) |
 
 ## 협업 방식
 
@@ -262,9 +226,9 @@ src/
 | 콘솔에 `ERR_CONNECTION_REFUSED` | API 서버가 꺼져 있음 | 다른 터미널에서 `npm run dev:api` 실행 |
 | 목록은 나오는데 도서 상세가 "정보 없음" | `--id ID` 없이 json-server를 직접 실행해 `/books/1` 조회 실패 | `npm run dev:api`로 실행 |
 | 목록 화면에 "로그인이 필요해요" 표시 | 브라우저에 로그인 정보가 없음 | 로그인 화면에서 로그인 |
+| 영어로 검색하면 상관없는 책이 나옴 | json-server의 q가 표지 base64 문자열까지 검색함 | 받아온 목록을 제목·저자로만 거르도록 변경 |
 
 ## 한계 및 향후 계획
 
 - 현재 백엔드는 json-server이며, 이후 Backend 미니프로젝트에서 Spring Boot로 교체할 예정입니다.
 - 로그인 확인은 `localStorage` 값을 화면 코드에서 확인하는 방식입니다. 삭제 권한도 화면과 버튼을 제어하는 용도이며, 서버 차원의 인증·권한 검사는 없습니다. 비밀번호가 `db.json`에 평문으로 저장되므로 연습용으로만 사용합니다.
-- AI 표지 생성은 구현 중입니다.
