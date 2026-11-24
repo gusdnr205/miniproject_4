@@ -151,8 +151,7 @@ npm run dev
 
 ### AI 표지 생성 (구현 중)
 
-<!-- 📸 수정 화면의 AI 이미지 생성 팝업 (생성 전·후 비교가 보이면 가장 좋음) → docs/images/ai-cover.png -->
-<!-- ![AI 표지 생성](src/assets/ai-cover.png) -->
+![AI 표지 생성](src/assets/ai-cover.png)
 
 수정 화면의 **AI 이미지 생성** 버튼으로 팝업을 열어 표지를 만듭니다.
 
