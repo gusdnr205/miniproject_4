@@ -4,16 +4,8 @@ import BookForm from '../components/BookForm';
 import ImgGeneratorTab from '../components/ImgGeneratorTab';
 import "../styles/ImgGenerator.css";
 import DeleteBookDialog from '../components/DeleteBookDialog';
+import { getLoginUserId } from '../utils/bookPermissions';
 import { useFetch } from '../api/useFetch';
-
-// 로그인할 때 LoginPage가 저장한 사용자 정보 { id, userNm }
-function getLoginUser() {
-  try {
-    return JSON.parse(localStorage.getItem('loginUser')) ?? {};
-  } catch {
-    return {};
-  }
-}
 
 // 도서 수정 페이지 (/books/:id/edit)
 export default function BookEditPage() {
@@ -34,7 +26,7 @@ export default function BookEditPage() {
       .then((data) => {
         if (ignore) return;
         // 내 책만 수정 가능: 남의 책이면 팝업 → 목록으로
-        const loginId = getLoginUser().id;
+        const loginId = getLoginUserId();
         // 로그인 안 했으면 팝업 → 로그인 화면으로
         if (!loginId) {
           window.alert('로그인 후 이용할 수 있어요.');
