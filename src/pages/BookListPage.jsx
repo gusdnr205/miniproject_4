@@ -41,14 +41,14 @@ function getStartDate(days) {
 
 // API 명세서 기준 경로 (서버 주소 뒤에 붙는 부분)
 //   내 도서 목록 : /books?AUTHOR_ID={로그인ID}&_sort=CREATED_AT&_order=desc (최신 등록순)
-//   검색        : ...&q={검색어}
+//   검색        : 받아온 뒤 화면에서 제목·저자로 거름 (q는 표지 base64까지 검색해서 사용 안 함)
 //   장르 필터    : ...&GENRE={장르ID}  ("장르 전체"면 생략)
 //   등록일  : ...&CREATED_AT_gte={시작 날짜}  (그 날짜 이후에 만든 책만, "전체"면 생략)
 function buildBooksUrl(authorId, keyword, genre, days) {
   const params = new URLSearchParams({ _sort: 'CREATED_AT', _order: 'desc' });
   // 관리자만 작성자 필터를 생략해 다른 사용자의 도서도 관리할 수 있다.
   if (!isAdmin(authorId)) params.append('AUTHOR_ID', authorId);
-  if (keyword) params.append('q', keyword);
+  // if (keyword) params.append('q', keyword);  // q(전체 필드 검색)는 표지 base64까지 검색돼서 사용 안 함 → 아래 load()에서 제목·저자로 거름
   if (genre) params.append('GENRE', genre);
   if (days !== '') params.append('CREATED_AT_gte', getStartDate(days));
   return `/books?${params.toString()}`;
@@ -95,7 +95,12 @@ export default function BookListPage() {
       try {
         const data = await request(buildBooksUrl(authorId, filter.keyword, filter.genre, filter.days));
         if (ignore) return;
-        setBooks(data);
+        // 제목 또는 저자에 검색어가 들어간 책만 (대소문자 무시)
+        const kw = filter.keyword.toLowerCase();
+        const list = kw
+          ? data.filter((b) => `${b.TITLE} ${b.AUTHOR_NM}`.toLowerCase().includes(kw))
+          : data;
+        setBooks(list);
         setStatus('done');
       } catch (err) {
         if (ignore) return;
