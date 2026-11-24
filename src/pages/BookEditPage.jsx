@@ -81,7 +81,7 @@ export default function BookEditPage() {
     if (!window.confirm(`'${book.TITLE}'을(를) 삭제할까요? 삭제하면 되돌릴 수 없어요.`)) return;
     try {
       await saveBook(`/books/${id}`, { method: 'DELETE' });
-      window.alert('수정 내용을 저장했어요.');
+      window.alert('도서를 삭제했어요.');
       navigate('/books', { replace: true });
     } catch {
       // 오류 문구는 saveError로 아래에 표시됨
