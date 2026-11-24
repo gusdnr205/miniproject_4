@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-function ImgGenerator({ title, author, content, cover_image_url, keywords, user_request, button_text, api_key, id, onGenerated }) {
+function ImgGenerator({ title, author, content, cover_image_url, keywords, user_request, button_text, api_key, id, quality, onGenerated }) {
   const OPENAI_IMAGE_API_URL = 'https://api.openai.com/v1/images/generations';
   const [isGenerating, setIsGenerating] = useState(false)
   const [error, setError] = useState('')
@@ -30,44 +30,6 @@ function ImgGenerator({ title, author, content, cover_image_url, keywords, user_
 6. 제목이 제공되지 않았다면 임의의 제목이나 글자를 넣지 않는다. 글자가 없어도 표지가 완성도 있어 보이도록 구성한다.
 `.trim()
 
-  // // 1. OpenAI 이미지 생성 요청
-  // const res = await fetch(OPENAI_IMAGE_API_URL, {
-  //   method: 'POST',
-  //   headers: {
-  //     'Content-Type': 'application/json',
-  //     Authorization: `Bearer ${api_key}`,
-  //   },
-  //   body: JSON.stringify({
-  //     model: 'gpt-image-2',
-  //     prompt: prompt,
-  //     n: 1,
-  //     size: '1024x1536',
-  //     quality: 'auto',
-  //     output_format: 'png',
-  //   }),
-  // });
-
-  // if (!res.ok) throw new Error('OpenAI 요청 실패');
-
-  // // 2. OpenAI 응답 파싱 후 b64_json 추출
-  // const data = await res.json();
-  // const b64Json = data.data?.[0]?.b64_json;
-
-  // // b64_json을 Data URL 형태로 변환합니다.
-  // const imageSrc= `data:image/png;base64,${b64Json}`;
-
-  // // 3. json-server에 coverImageUrl만 PATCH
-  // // 바뀔 필드만 body에 담아 전송합니다.
-  // await fetch(`http://localhost:3000/books/${id}`, {
-  //   method: 'PATCH',
-  //   headers: {
-  //     'Content-Type': 'application/json',
-  //   },
-  //   body: JSON.stringify({
-  //     coverImageUrl: imageSrc,
-  //   }),
-  // });
-
   const generateImage = async () => {
     if (!api_key) {
       setError('OpenAI API Key를 입력해 주세요.')
@@ -89,7 +51,7 @@ function ImgGenerator({ title, author, content, cover_image_url, keywords, user_
           prompt,
           n: 1,
           size: '1024x1536',
-          quality: 'auto',
+          quality,
           output_format: 'png',
         }),
       })
@@ -104,25 +66,6 @@ function ImgGenerator({ title, author, content, cover_image_url, keywords, user_
 
       if (!imageSrc) throw new Error('생성된 이미지 URL을 찾을 수 없습니다.')
 
-      /* DB PATCH는 read-only 개발 환경을 고려해 일단 실행하지 않음
-       * 추후 저장 기능을 다시 연결할 때 이 주석을 해제, 하단의 onGenerated?.(imageSrc) 제거
-       * const saveRes = await fetch(`http://localhost:3000/books/${id}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          COVER_IMAGE_URL: imageSrc,
-        }),
-      })
-
-      if (!saveRes.ok) throw new Error('생성된 이미지 저장에 실패했습니다.')
-
-      const savedBook = await saveRes.json()
-      onGenerated?.(savedBook.COVER_IMAGE_URL || imageSrc)
-      */
-
-      // 우선 DB 저장 없이 생성 결과만 부모 컴포넌트로 전달합니다.
       onGenerated?.(imageSrc)
     } catch (requestError) {
       setError(requestError.message)
