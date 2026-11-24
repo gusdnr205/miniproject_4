@@ -144,7 +144,7 @@ export default function BookEditPage() {
         coverDirty={coverChanged}
         onSubmit={handleSubmit}
         onCancel={() => navigate(`/books/${id}`)}
-        onDelete={setConfirmingDelete(true)}
+        onDelete={() => setConfirmingDelete(true)}
         submitting={saving}
       />
     </main>
