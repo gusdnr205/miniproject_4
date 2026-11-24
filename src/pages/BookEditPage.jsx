@@ -32,7 +32,15 @@ export default function BookEditPage() {
       .then((data) => {
         if (ignore) return;
         // 내 책만 수정 가능: 남의 책이면 팝업 → 목록으로
-        if (data.AUTHOR_ID !== getLoginUser().id) {
+        const loginId = getLoginUser().id;
+        // 로그인 안 했으면 팝업 → 로그인 화면으로
+        if (!loginId) {
+          window.alert('로그인 후 이용할 수 있어요.');
+          navigate('/login', { replace: true });
+          return;
+        }
+        // 내 책만 수정 가능: 남의 책이면 팝업 → 목록으로
+        if (data.AUTHOR_ID !== loginId) {
           window.alert('본인이 등록한 도서만 수정할 수 있어요.');
           navigate('/books', { replace: true });
           return;
@@ -60,6 +68,7 @@ export default function BookEditPage() {
           UPDATED_AT: new Date().toISOString(),
         },
       });
+      window.alert('수정 내용을 저장했어요.');
       navigate(`/books/${id}`);
     } catch {
       // 오류 문구는 saveError로 아래에 표시됨
@@ -72,6 +81,7 @@ export default function BookEditPage() {
     if (!window.confirm(`'${book.TITLE}'을(를) 삭제할까요? 삭제하면 되돌릴 수 없어요.`)) return;
     try {
       await saveBook(`/books/${id}`, { method: 'DELETE' });
+      window.alert('수정 내용을 저장했어요.');
       navigate('/books', { replace: true });
     } catch {
       // 오류 문구는 saveError로 아래에 표시됨
@@ -123,6 +133,7 @@ export default function BookEditPage() {
         genres={genres}
         initialBook={book}
         cover={cover}
+        coverDirty={coverChanged}
         onSubmit={handleSubmit}
         onCancel={() => navigate(`/books/${id}`)}
         onDelete={handleDelete}

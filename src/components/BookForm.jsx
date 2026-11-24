@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import '../styles/BookForm.css';
 
+const TITLE_MAX = 100; // 제목 최대 글자 수 
 const CONTENT_MAX = 1000; // 책 소개 최대 글자 수
 
 // 도서 등록·수정 공용 폼
@@ -21,6 +22,7 @@ function BookForm({
   submitting = false,
   cover = null,
   onDelete = null,
+  coverDirty = false,
 }) {
   const isEdit = Boolean(initialBook);
   const [title, setTitle] = useState(initialBook?.TITLE ?? '');
@@ -28,6 +30,11 @@ function BookForm({
   const [genre, setGenre] = useState(initialBook?.GENRE ?? '');
   const [content, setContent] = useState(initialBook?.CONTENT ?? '');
   const [errors, setErrors] = useState({});
+
+  // 입력하면 그 칸의 오류 문구만 바로 지움
+  const clearError = (field) => {
+    setErrors((prev) => ({ ...prev, [field]: undefined }));
+  };
 
   // 유효성 검사: 제목·장르·책 소개는 필수 (공백만 입력도 안 됨)
   const validate = () => {
@@ -37,6 +44,25 @@ function BookForm({
     if (!content.trim()) next.content = '책 소개를 입력해 주세요.';
     setErrors(next);
     return Object.keys(next).length === 0;
+  };
+
+  // 처음 값과 지금 값이 하나라도 다르면 "고친 게 있음"
+  const initial = {
+    title: initialBook?.TITLE ?? '',
+    authorNm: initialBook?.AUTHOR_NM ?? defaultAuthor,
+    genre: String(initialBook?.GENRE ?? ''),
+    content: initialBook?.CONTENT ?? '',
+  };
+  const isDirty =
+    title !== initial.title ||
+    authorNm !== initial.authorNm ||
+    String(genre) !== initial.genre ||
+    content !== initial.content || coverDirty;
+
+  // 취소: 고친 게 있을 때만 한 번 물어봄
+  const handleCancel = () => {
+    if (isDirty && !window.confirm('작성 중인 내용이 사라져요. 나갈까요?')) return;
+    onCancel();
   };
 
   const handleSubmit = (e) => {
@@ -56,18 +82,24 @@ function BookForm({
         <section className="book-form-fields">
           <h2 className="book-form-section">기본 정보</h2>
 
-          <label className="book-form-label" htmlFor="book-title">
-            제목 <span className="book-form-required">*</span>
-          </label>
+          <div className="book-form-label-row">
+            <label className="book-form-label" htmlFor="book-title">
+              제목 <span className="book-form-required">*</span>
+            </label>
+            {errors.title && <span className="book-form-error">{errors.title}</span>}
+          </div>
           <input
             id="book-title"
             className="book-form-input"
             value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="도서 제목을 입력하세요"
+            onChange={(e) => {
+              setTitle(e.target.value);
+              clearError('title');
+            }}
+            placeholder="도서 제목을 입력하세요 (100자 이내)"
+            maxLength={TITLE_MAX}
             aria-invalid={Boolean(errors.title)}
           />
-          {errors.title && <p className="book-form-error">{errors.title}</p>}
 
           <div className="book-form-row">
             <div>
@@ -81,14 +113,20 @@ function BookForm({
               />
             </div>
             <div>
-              <label className="book-form-label" htmlFor="book-genre">
-                장르 <span className="book-form-required">*</span>
-              </label>
+              <div className="book-form-label-row">
+                <label className="book-form-label" htmlFor="book-genre">
+                  장르 <span className="book-form-required">*</span>
+                </label>
+                {errors.genre && <span className="book-form-error">{errors.genre}</span>}
+              </div>
               <select
                 id="book-genre"
                 className="book-form-input"
                 value={genre}
-                onChange={(e) => setGenre(e.target.value)}
+                onChange={(e) => {
+                  setGenre(e.target.value);
+                  clearError('genre');
+                }}
                 aria-invalid={Boolean(errors.genre)}
               >
                 <option value="">장르를 선택하세요</option>
@@ -96,30 +134,36 @@ function BookForm({
                   <option key={g.ID} value={g.ID}>{g.GENRE_NM}</option>
                 ))}
               </select>
-              {errors.genre && <p className="book-form-error">{errors.genre}</p>}
             </div>
           </div>
 
-          <label className="book-form-label" htmlFor="book-content">
-            책 소개 <span className="book-form-required">*</span>
-          </label>
+          <div className="book-form-label-row">
+            <label className="book-form-label" htmlFor="book-content">
+              책 소개 <span className="book-form-required">*</span>
+            </label>
+            {errors.content && <span className="book-form-error">{errors.content}</span>}
+          </div>
           <textarea
             id="book-content"
             className="book-form-input book-form-textarea"
             value={content}
-            onChange={(e) => setContent(e.target.value)}
+            onChange={(e) => {
+              setContent(e.target.value);
+              clearError('content');
+            }}
             placeholder="도서 내용을 입력하세요"
             rows={6}
             maxLength={CONTENT_MAX}
             aria-invalid={Boolean(errors.content)}
           />
           <p className="book-form-count">{content.length} / {CONTENT_MAX}자</p>
-          {errors.content && <p className="book-form-error">{errors.content}</p>}
         </section>
 
         <section className="book-form-cover">
           <h2 className="book-form-section">표지 이미지</h2>
-          {cover ?? (
+          {typeof cover === 'function'
+            ? cover({ TITLE: title, AUTHOR_NM: authorNm, GENRE: Number(genre), CONTENT: content })
+            : cover ?? (
             <div className="book-form-cover-box book-form-cover-empty">
               <strong>등록된 표지가 없어요</strong>
               <span>등록 후 AI 표지를 만들 수 있어요.</span>
@@ -139,10 +183,15 @@ function BookForm({
             삭제
           </button>
         )}
-        <button type="button" className="book-form-button book-form-cancel" onClick={onCancel}>
+        <button type="button" className="book-form-button book-form-cancel" onClick={handleCancel}>
           취소
         </button>
-        <button type="submit" className="book-form-button book-form-submit" disabled={submitting}>
+        <button
+          type="submit"
+          className="book-form-button book-form-submit"
+          disabled={submitting || (isEdit && !isDirty)}
+          title={isEdit && !isDirty ? '바뀐 내용이 없어요' : undefined}
+        >
           {submitting ? '저장 중…' : isEdit ? '저장' : '등록'}
         </button>
       </div>

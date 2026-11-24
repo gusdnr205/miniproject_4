@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import BookForm from '../components/BookForm';
+import ImgGeneratorTab from '../components/ImgGeneratorTab';
+import "../styles/ImgGenerator.css";
 import { useFetch } from '../api/useFetch';
 
 // 로그인할 때 LoginPage가 저장한 사용자 정보 { id, userNm }
@@ -19,6 +21,7 @@ export default function BookNewPage() {
   const [genres, setGenres] = useState([]);
   const { request: fetchGenres, error: genreError } = useFetch();
   const { request: saveBook, loading: saving, error: saveError } = useFetch();
+  const [coverUrl, setCoverUrl] = useState('');  
 
   // 장르 목록: GET /genre
   useEffect(() => {
@@ -26,6 +29,15 @@ export default function BookNewPage() {
       .then(setGenres)
       .catch(() => {});
   }, [fetchGenres]);
+
+  // 로그인 안 했으면 팝업 → 로그인 화면으로 (책이 작성자 없이 저장되는 걸 막음)
+  const alerted = useRef(false); // 개발 모드에서 팝업이 두 번 뜨는 걸 막음
+  useEffect(() => {
+    if (loginUser.id || alerted.current) return;
+    alerted.current = true;
+    window.alert('로그인 후 도서를 등록할 수 있어요.');
+    navigate('/login', { replace: true });
+  }, [loginUser.id, navigate]);
 
   // 도서 등록: POST /books → 성공하면 새 도서 상세 화면으로 이동
   const handleSubmit = async (values) => {
@@ -37,16 +49,37 @@ export default function BookNewPage() {
           ...values,
           AUTHOR_NM: values.AUTHOR_NM || loginUser.userNm || '',
           AUTHOR_ID: loginUser.id,
-          COVER_IMAGE_URL: '',
+          COVER_IMAGE_URL: coverUrl,
           CREATED_AT: now,
           UPDATED_AT: now,
         },
       });
+      window.alert('도서를 등록했어요.');
       navigate(`/books/${saved.ID}`);
     } catch {
       // 오류 문구는 saveError로 아래에 표시됨
     }
   };
+
+  // 로그인 화면으로 넘어가는 동안 폼을 그리지 않음
+  if (!loginUser.id) return null;
+
+  const renderCover = (values) => (
+  <div className="book-cover-panel">
+      {coverUrl ? (
+        <img className="book-cover-image" src={coverUrl} alt={`새 표지`} />
+      ) : (
+        <div className="book-form-cover-box book-form-cover-empty">
+          <strong>등록된 표지가 없어요</strong>
+          <span>아래 버튼으로 AI 표지를 만들 수 있어요.</span>
+        </div>
+      )}    <ImgGeneratorTab
+      book={{ ...values, COVER_IMAGE_URL: coverUrl }}
+      label={coverUrl ? 'AI 표지 수정' : 'AI 표지 생성'}
+      onApply={setCoverUrl}
+    />
+  </div>
+);
 
   return (
     <main className="book-form-page">
@@ -56,6 +89,8 @@ export default function BookNewPage() {
       <BookForm
         genres={genres}
         defaultAuthor={loginUser.userNm ?? ''}
+        cover={renderCover}
+        coverDirty={coverUrl !== ''}
         onSubmit={handleSubmit}
         onCancel={() => navigate('/books')}
         submitting={saving}
