@@ -22,9 +22,9 @@ function formatDate(iso) {
   return `${d.getFullYear()}.${mm}.${dd}`;
 }
 
-// 표지 생성일 선택칸 목록 (days: 오늘부터 며칠 전까지 볼지, ''면 전체)
+// 등록일 선택칸 목록 (days: 오늘부터 며칠 전까지 볼지, ''면 전체)
 const DATE_OPTIONS = [
-  { value: '', label: '표지 생성일: 전체 기간' },
+  { value: '', label: '등록일: 전체 기간' },
   { value: '0', label: '오늘' },
   { value: '7', label: '최근 7일' },
   { value: '30', label: '최근 30일' },
@@ -43,7 +43,7 @@ function getStartDate(days) {
 //   내 도서 목록 : /books?AUTHOR_ID={로그인ID}&_sort=CREATED_AT&_order=desc (최신 등록순)
 //   검색        : ...&q={검색어}
 //   장르 필터    : ...&GENRE={장르ID}  ("장르 전체"면 생략)
-//   표지 생성일  : ...&CREATED_AT_gte={시작 날짜}  (그 날짜 이후에 만든 책만, "전체"면 생략)
+//   등록일  : ...&CREATED_AT_gte={시작 날짜}  (그 날짜 이후에 만든 책만, "전체"면 생략)
 function buildBooksUrl(authorId, keyword, genre, days) {
   const params = new URLSearchParams({ _sort: 'CREATED_AT', _order: 'desc' });
   // 관리자만 작성자 필터를 생략해 다른 사용자의 도서도 관리할 수 있다.
