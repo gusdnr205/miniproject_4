@@ -1,42 +1,6 @@
-# React + Vite
-
-## 로컬 조회 API
-
-프로젝트 루트에서 `npm ci`로 의존성을 설치한 뒤 `npm run dev:api`를 실행합니다. React 개발 서버는 다른 터미널에서 `npm run dev`로 실행할 수 있습니다.
-
-기본 주소는 `http://127.0.0.1:3000`입니다. React에서 사용할 API 주소는 `.env`의 `VITE_API_URL`로 설정합니다.
-
-| GET 경로 | 용도 |
-| --- | --- |
-| `/books` | 전체 도서 목록 |
-| `/books/1` | 숫자 `ID`로 도서 한 권 조회 |
-| `/books?AUTHOR_ID=demo-seoyun&GENRE=1` | 작성자와 장르로 필터링 |
-| `/user?USER_ID=demo-seoyun` | 샘플 유저 조회 |
-| `/genre` | 장르 전체 조회 |
-| `/genre?GENRE_CODE=1` | 장르 코드로 조회 |
-
-`db.json`의 도서 `GENRE`는 장르의 `GENRE_CODE`와 연결됩니다. 샘플 유저의 `PASSWORD`와 도서의 `COVER_IMAGE_URL`은 빈 문자열입니다. 이 서버에서는 GET 조회만 지원합니다.
-
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the Oxlint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
-
-
-
 # 창작자를 위한 도서관리시스템
 
-> 도서를 등록·관리하고, 도서 내용에 어울리는 표지를 AI로 생성하는 웹 애플리케이션 (Frontend)
+> 창작자가 도서를 등록·관리하고, 도서 내용에 어울리는 표지를 AI로 생성하는 웹 애플리케이션 (Frontend)
 
 ## 프로젝트 개요
 
@@ -51,13 +15,13 @@ If you are developing a production application, we recommend using TypeScript wi
 
 | 구분 | 기능 |
 | --- | --- |
-| 로그인 | 아이디·비밀번호 로그인, 헤더에 유저 이름 표시와 로그아웃 |
+| 로그인 | 아이디·비밀번호 로그인, header에 유저 이름 표시와 로그아웃 |
 | 도서 목록 | 카드 목록, 검색어·장르·등록일 기간 필터, 최신 등록순 정렬, 로딩·에러·빈 목록 안내 |
 | 도서 등록 | 제목·작가·장르·책 소개 입력, 필수값 검증, 작성자는 로그인 정보로 자동 입력 |
-| 도서 상세 | 표지, 작성일·수정일, 본문 조회 |
-| 도서 수정 | 기존 정보를 불러와 수정 |
+| 도서 상세 | 각 BookCard에 대해 표지, 작성일·수정일, 본문 조회 |
+| 도서 수정 | 사용자 본인이 등록한 도서 기존 정보를 불러와 수정 |
 | 도서 삭제 | 목록에서 여러 권 선택 삭제, 상세에서 단건 삭제, 삭제 전 확인, 권한에 따른 삭제 제어 |
-| AI 표지 생성 | 수정 화면에서 도서 정보와 키워드로 OpenAI 이미지 생성 **(구현 중)** |
+| AI 표지 생성 | 수정 화면에서 도서 정보와 키워드로 OpenAI 표지 이미지 생성 |
 
 ## 기술 스택
 
@@ -189,7 +153,8 @@ API Key는 코드나 `db.json`에 저장하지 않습니다.
 ```text
 src/
 ├─ api/          useFetch.js            공통 API 요청 훅
-├─ components/   Header, Footer, BookForm, DeleteBookDialog, ImgGenerator* ...
+├─ assets/       ai-cover.png, book-delete.png, book-detail.png ...       
+├─ components/   Header, Footer, BookForm, DeleteBookDialog, ImgGenerator ...
 ├─ pages/        LoginPage, BookListPage, BookDetailPage, BookNewPage, BookEditPage
 ├─ styles/       화면·컴포넌트별 CSS
 ├─ utils/        bookPermissions.js     로그인 유저 확인, 삭제 권한 판단
@@ -228,10 +193,10 @@ src/
 | 쿼리 | 용도 |
 | --- | --- |
 | `AUTHOR_ID` | 작성자별 조회 (일반 사용자는 본인 ID, 관리자는 생략) |
-| `q` | 검색어 |
+| 화면 내 검색 | 조회된 도서 목록을 대상으로 제목(TITLE) 및 저자명(AUTHOR_NM) 기준 부분 일치 검색 |
 | `GENRE` | 장르 필터 |
 | `CREATED_AT_gte` | 등록일 기간 필터 (시작 날짜 이후) |
-| `_sort`, `_order` | 정렬 (`CREATED_AT`, `desc`) |
+| `_sort`, `_order` | 조회 결과 정렬 (`CREATED_AT`, `desc`) |
 
 ## 협업 방식
 
@@ -266,4 +231,3 @@ src/
 
 - 현재 백엔드는 json-server이며, 이후 Backend 미니프로젝트에서 Spring Boot로 교체할 예정입니다.
 - 로그인 확인은 `localStorage` 값을 화면 코드에서 확인하는 방식입니다. 삭제 권한도 화면과 버튼을 제어하는 용도이며, 서버 차원의 인증·권한 검사는 없습니다. 비밀번호가 `db.json`에 평문으로 저장되므로 연습용으로만 사용합니다.
-- AI 표지 생성은 구현 중입니다.
